@@ -12,7 +12,12 @@ def get_filename_from_tag(url, source):
     # source = source[1:] if source[0] == "/" else source
     # Wrong realization: last 'dot' changes too for '-'. Refactor re-pattern
     # filename_from_tag = re.sub(r'[\W+?]', '-', source)
-    filename_from_tag = netloc + re.sub(r'[/+?]', '-', source)
+    
+    #filename_from_tag = netloc + re.sub(r'[/+?]', '-', source)
+    
+    tag_without_scheme = urlparse(source).path
+    #filename_from_tag = netloc + re.sub(r'[\W+?]', '-', tag_without_scheme)
+    filename_from_tag = netloc + re.sub(r'[/+?]', '-', tag_without_scheme)
     return filename_from_tag
 
 
@@ -62,7 +67,8 @@ def img_download(request, download_path):
     new_src_to_img_list = []
     for link in soup.find_all('img'):
         if link.get('src') and not urlparse(link.get('src')).scheme:
-            response = requests.get(request.url + str(link.get('src')))
+            #response = requests.get(request.url + str(link.get('src')))
+            response = requests.get(request.url + urlparse(link.get('src')).path)#!!?
             filename_from_img_link = os.path.join(
                 download_path,
                 get_filename_from_tag(
@@ -80,10 +86,11 @@ def link_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_href_to_link_list = []
     for link in soup.find_all('link'):
-        response = requests.get(request.url + str(link.get('href')))#TODO REFACTOR: DOUBLE SCHEME POSSIBLE
+        response = requests.get(request.url + urlparse(link.get('href')).path)#TODO REFACTOR: DOUBLE SCHEME POSSIBLE
+        #response = requests.get(request.url + str(link.get('href')))#TODO REFACTOR: DOUBLE SCHEME POSSIBLE
         if not os.path.splitext(link.get('href'))[1]:
             file_name = get_filename_from_tag(request.url, link.get('href')) + '.html'#TODO refactor
-        else:
+        elif os.path.splitext(link.get('href'))[1]:
             file_name = get_filename_from_tag(request.url, link.get('href'))
         
         filename_from_link_link = os.path.join(
