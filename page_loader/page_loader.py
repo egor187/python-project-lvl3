@@ -71,10 +71,72 @@ def img_download(request, download_path):
                 )
             )
         new_src_to_img_list.append(filename_from_img_link)
-        new_src_to_img_list.append(filename_from_img_link)
         with open(filename_from_img_link, "wb") as r:
             r.write(response.content)
     return new_src_to_img_list
+
+
+def link_download(request, download_path):
+    soup = BeautifulSoup(request.text, 'html.parser')
+    new_href_to_link_list = []
+    for link in soup.find_all('link'):
+        response = requests.get(request.url + str(link.get('href')))#TODO REFACTOR: DOUBLE SCHEME POSSIBLE
+        if not os.path.splitext(link.get('href'))[1]:
+            file_name = get_filename_from_tag(request.url, link.get('href')) + '.html'#TODO refactor
+        else:
+            file_name = get_filename_from_tag(request.url, link.get('href'))
+        
+        filename_from_link_link = os.path.join(
+            download_path,
+            file_name
+        )
+
+        if not urlparse(link.get('href')).scheme or urlparse(link.get('href')).scheme and urlparse(link.get('href')).netloc == urlparse(request.url).netloc:
+            
+
+        #if not urlparse(link.get('href')).scheme:
+        #    response = requests.get(request.url + str(link.get('href')))
+            #file_name = get_filename_from_tag(request.url, link.get('href'))
+        #    filename_from_link_link = os.path.join(
+        #        download_path,
+                #get_filename_from_tag(
+                #    request.url,
+                #    link.get('href')
+        #        file_name
+        #    )
+        #elif urlparse(link.get('href')).scheme and urlparse(link.get('href')) == urlparse(request.url).netloc:
+        #    response = requests.get(request.url + str(link.get('href')))
+            #file_name = get_filename_from_tag(request.url, link.get('href'))
+        #    filename_from_link_link = os.path.join(
+        #        download_path,
+                #get_filename_from_tag(
+                #    request.url,
+                #    link.get('href')
+        #        file_name
+        #    )
+
+
+        #new_src_to_link_list.append(filename_from_link_link)
+
+
+                new_href_to_link_list.append(filename_from_link_link)
+       
+
+                with open(filename_from_link_link, "wb") as r:
+                    r.write(response.content)
+    return new_href_to_link_list
+        
+#        if urlparse(request.url).netloc == urlparse(file_name).netloc:
+#            new_href_to_link_list.append(filename_from_link_link)
+#       
+#
+#        with open(filename_from_link_link, "wb") as r:
+#            r.write(response.content)
+#    return new_href_to_link_list
+
+
+def script_download():
+    pass
 
 
 def download(url, download_path):
@@ -87,12 +149,33 @@ def download(url, download_path):
 
     # new_src_for_img = img_download(url, path_to_dir) - uses
     # double_request to source in img_download()
+    
     new_src_for_img = img_download(request, path_to_dir)
+    
+    new_href_for_link = link_download(request, path_to_dir)
+
 
     with open(path_to_file, "w") as r:
         soup = BeautifulSoup(request.text, "html.parser")
         for index, tag in enumerate(soup.find_all('img')):
             tag['src'] = new_src_for_img[index]
-        r.write(soup.prettify(formatter="html5"))
+ 
+# NEED TO FILTER EXIST TAGS TO EVALUEATE WITH LEN OF NEW_LIST > EXCLUDE TAGS WITH FOREIGN NETLOC
+# REPLACE IT OUT OF CONTEXT MANAGER
 
+        old_href_for_link = []
+        for tag in soup.find_all('link'):
+            if not urlparse(tag.get('href')).scheme or urlparse(tag.get('href')).scheme and urlparse(tag.get('href')).netloc == urlparse(request.url).netloc:
+                old_href_for_link.append(tag)
+        
+        for index, tag in enumerate(old_href_for_link):
+            tag['href'] = new_href_for_link[index]
+
+        #for index, tag in enumerate(soup.find_all('link')):
+        #    tag['href'] = new_href_for_link[index]
+
+
+        r.write(soup.prettify(formatter="html5"))
+    
+    #return new_href_for_link
     return path_to_file
