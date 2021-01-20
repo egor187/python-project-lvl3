@@ -1,7 +1,7 @@
 import os.path
 import os
 import tempfile
-from page_loader import download, img_download
+from page_loader import download
 
 
 def test_file_html_create():
@@ -27,7 +27,13 @@ def test_iscorrect_img_name():
     with tempfile.TemporaryDirectory() as tmpdir:
         url = "https://page-loader.hexlet.repl.co/"
         download(url, tmpdir)
-        expect_dir_name = os.path.join(tmpdir, "page-loader-hexlet-repl-co_files")
-        expect_img_file_name = os.path.join(tmpdir, expect_dir_name,  "page-loader-hexlet-repl-co-assets-professions-nodejs.png")
+        expect_dir_name = os.path.join(
+            tmpdir,
+            "page-loader-hexlet-repl-co_files"
+        )
+        expect_img_file_name = os.path.join(
+            tmpdir,
+            expect_dir_name,
+            "page-loader-hexlet-repl-co-assets-professions-nodejs.png"
+        )
         assert os.path.isfile(expect_img_file_name)
-

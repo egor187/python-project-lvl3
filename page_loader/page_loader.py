@@ -36,7 +36,7 @@ def get_content_type(url):
     return content_type
 
 
-#def img_download(url, download_path):
+# def img_download(url, download_path):
 #    request = requests.get(url)
 #    soup = BeautifulSoup(request.text, 'html.parser')
 #    new_src_to_img_list = []
@@ -85,12 +85,12 @@ def download(url, download_path):
     path_to_dir = path + '_files'
     os.mkdir(path_to_dir)
 
-    #new_src_for_img = img_download(url, path_to_dir)
+    # new_src_for_img = img_download(url, path_to_dir) - uses
+    # double_request to source in img_download()
     new_src_for_img = img_download(request, path_to_dir)
 
     with open(path_to_file, "w") as r:
         soup = BeautifulSoup(request.text, "html.parser")
-        #!!!
         for index, tag in enumerate(soup.find_all('img')):
             tag['src'] = new_src_for_img[index]
         r.write(soup.prettify(formatter="html5"))
