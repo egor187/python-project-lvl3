@@ -5,19 +5,6 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
-# TODO try with urllib.parse instead 're'
-# import urllib.parse
-
-# def get_filename_from_tag(url, source):
-#    url_parsed = urlparse(url)
-#    domain = url_parsed.netloc
-#    path = url_parsed.path
-#    dir_name = domain + path
-#    source_parsed = urlparse(source)
-#    file_name = source_parsed.netloc + source_parsed.path
-#    filename_from_tag = re.sub(r'[\W+?]', '-', dir_name + file_name)
-#    return filename_from_tag
-
 
 def get_filename_from_tag(url, source):
     url_parsed = urlparse(url)
@@ -49,19 +36,41 @@ def get_content_type(url):
     return content_type
 
 
-def img_download(url, download_path):
-    request = requests.get(url)
+#def img_download(url, download_path):
+#    request = requests.get(url)
+#    soup = BeautifulSoup(request.text, 'html.parser')
+#    new_src_to_img_list = []
+#    for link in soup.find_all('img'):
+#        response = requests.get(request.url + str(link.get('src')))
+#        filename_from_img_link = os.path.join(
+#            download_path,
+#            get_filename_from_tag(
+#                url,
+#                link.get('src')
+#             )
+#        )
+#        new_src_to_img_list.append(filename_from_img_link)
+#        new_src_to_img_list.append(filename_from_img_link)
+#        with open(filename_from_img_link, "wb") as r:
+#            r.write(response.content)
+#    return new_src_to_img_list
+
+
+# Refactor to download img only from tags WITH 'src' and WITHOUT SCHEME
+def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_img_list = []
     for link in soup.find_all('img'):
-        response = requests.get(request.url + str(link.get('src')))
-        filename_from_img_link = os.path.join(
-            download_path,
-            get_filename_from_tag(
-                url,
-                link.get('src')
-             )
-        )
+        if link.get('src') and not urlparse(link.get('src')).scheme:
+            response = requests.get(request.url + str(link.get('src')))
+            filename_from_img_link = os.path.join(
+                download_path,
+                get_filename_from_tag(
+                    request.url,
+                    link.get('src')
+                )
+            )
+        new_src_to_img_list.append(filename_from_img_link)
         new_src_to_img_list.append(filename_from_img_link)
         with open(filename_from_img_link, "wb") as r:
             r.write(response.content)
@@ -76,12 +85,14 @@ def download(url, download_path):
     path_to_dir = path + '_files'
     os.mkdir(path_to_dir)
 
-    new_src_for_img = img_download(url, path_to_dir)
+    #new_src_for_img = img_download(url, path_to_dir)
+    new_src_for_img = img_download(request, path_to_dir)
 
     with open(path_to_file, "w") as r:
         soup = BeautifulSoup(request.text, "html.parser")
+        #!!!
         for index, tag in enumerate(soup.find_all('img')):
             tag['src'] = new_src_for_img[index]
-        r.write(soup.prettify())
+        r.write(soup.prettify(formatter="html5"))
 
     return path_to_file
