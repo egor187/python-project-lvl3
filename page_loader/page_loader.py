@@ -96,9 +96,6 @@ def link_download(request, download_path):
     return new_href_to_link_list
 
 
-
-
-
 def script_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_script_list = []
@@ -132,10 +129,6 @@ def script_download(request, download_path):
                     r.write(response.text)
     return new_src_to_script_list
 
-    
-
-
-
 
 def download(url, download_path):
     request = requests.get(url)
@@ -164,8 +157,12 @@ def download(url, download_path):
                 == urlparse(request.url).netloc:
             old_href_for_link.append(tag)
 
-    old_src_for_script = [script for script in soup.find_all("script") if script.get("src") and urlparse(script.get("src")).netloc == urlparse(request.url).netloc or not urlparse(script.get("src")).scheme]
-
+    old_src_for_script = [
+        script for script in soup.find_all("script")
+        if script.get("src")
+        and urlparse(script.get("src")).netloc == urlparse(request.url).netloc
+        or not urlparse(script.get("src")).scheme
+    ]
 
     with open(path_to_file, "w") as r:
         for index, tag in enumerate(old_src_for_img):
@@ -178,5 +175,5 @@ def download(url, download_path):
             tag['src'] = new_src_for_script[index]
 
         r.write(soup.prettify(formatter="html5"))
-    
+
     return path_to_file
