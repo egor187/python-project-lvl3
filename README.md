@@ -12,3 +12,6 @@
 
 
 <a href="https://asciinema.org/a/PG5Y5SfexmqnpZ6wpY27u6BpR" target="_blank"><img src="https://asciinema.org/a/PG5Y5SfexmqnpZ6wpY27u6BpR.svg" /></a>
+
+
+<a href="https://asciinema.org/a/lt4v6f8ZOZDpqCQT3eEAGTSyj" target="_blank"><img src="https://asciinema.org/a/lt4v6f8ZOZDpqCQT3eEAGTSyj.svg" /></a>
