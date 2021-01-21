@@ -9,14 +9,7 @@ from urllib.parse import urlparse
 def get_filename_from_tag(url, source):
     url_parsed = urlparse(url)
     netloc = re.sub(r'[\W+?]', '-', url_parsed.netloc)
-    # source = source[1:] if source[0] == "/" else source
-    # Wrong realization: last 'dot' changes too for '-'. Refactor re-pattern
-    # filename_from_tag = re.sub(r'[\W+?]', '-', source)
-    
-    #filename_from_tag = netloc + re.sub(r'[/+?]', '-', source)
-    
     tag_without_scheme = urlparse(source).path
-    #filename_from_tag = netloc + re.sub(r'[\W+?]', '-', tag_without_scheme)
     filename_from_tag = netloc + re.sub(r'[/+?]', '-', tag_without_scheme)
     return filename_from_tag
 
@@ -41,34 +34,16 @@ def get_content_type(url):
     return content_type
 
 
-# def img_download(url, download_path):
-#    request = requests.get(url)
-#    soup = BeautifulSoup(request.text, 'html.parser')
-#    new_src_to_img_list = []
-#    for link in soup.find_all('img'):
-#        response = requests.get(request.url + str(link.get('src')))
-#        filename_from_img_link = os.path.join(
-#            download_path,
-#            get_filename_from_tag(
-#                url,
-#                link.get('src')
-#             )
-#        )
-#        new_src_to_img_list.append(filename_from_img_link)
-#        new_src_to_img_list.append(filename_from_img_link)
-#        with open(filename_from_img_link, "wb") as r:
-#            r.write(response.content)
-#    return new_src_to_img_list
-
-
-# Refactor to download img only from tags WITH 'src' and WITHOUT SCHEME
 def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_img_list = []
     for link in soup.find_all('img'):
         if link.get('src') and not urlparse(link.get('src')).scheme:
-            #response = requests.get(request.url + str(link.get('src')))
-            response = requests.get(request.url + urlparse(link.get('src')).path)#!!?
+            response = requests.get(
+                request.url + urlparse(
+                    link.get('src')
+                    ).path
+                )
             filename_from_img_link = os.path.join(
                 download_path,
                 get_filename_from_tag(
@@ -90,20 +65,29 @@ def link_download(request, download_path):
         if urlparse(link.get('href')).scheme:
             response = requests.get(link.get("href"))
         elif not urlparse(link.get("href")).scheme:
-            response = requests.get(request.url + urlparse(link.get("href")).path)
+            response = requests.get(
+                request.url + urlparse(
+                    link.get("href")
+                    ).path
+                )
 
         if not os.path.splitext(link.get('href'))[1]:
-            file_name = get_filename_from_tag(request.url, link.get('href')) + '.html'#TODO refactor
+            file_name = get_filename_from_tag(
+                request.url,
+                link.get('href')
+            ) + '.html'  # TODO refactor
         elif os.path.splitext(link.get('href'))[1]:
             file_name = get_filename_from_tag(request.url, link.get('href'))
-        
+
         filename_from_link_link = os.path.join(
             download_path,
             file_name
         )
 
-        if not urlparse(link.get('href')).scheme or urlparse(link.get('href')).scheme and urlparse(link.get('href')).netloc == urlparse(request.url).netloc:
-            
+        if not urlparse(link.get('href')).scheme \
+            or urlparse(link.get('href')).scheme \
+            and urlparse(link.get('href')).netloc \
+                == urlparse(request.url).netloc:
 
             new_href_to_link_list.append(filename_from_link_link)
 
@@ -125,10 +109,7 @@ def download(url, download_path):
     os.mkdir(path_to_dir)
 
     new_src_for_img = img_download(request, path_to_dir)
-    
     new_href_for_link = link_download(request, path_to_dir)
-    
-
 
     soup = BeautifulSoup(request.text, "html.parser")
 
@@ -137,24 +118,22 @@ def download(url, download_path):
         if tag.get("src") and not urlparse(tag.get('src')).scheme:
             old_src_for_img.append(tag)
 
-    
     old_href_for_link = []
     for tag in soup.find_all('link'):
-        if not urlparse(tag.get('href')).scheme or urlparse(tag.get('href')).scheme and urlparse(tag.get('href')).netloc == urlparse(request.url).netloc:
+        if not urlparse(tag.get('href')).scheme \
+            or urlparse(tag.get('href')).scheme \
+            and urlparse(tag.get('href')).netloc \
+                == urlparse(request.url).netloc:
+
             old_href_for_link.append(tag)
-    
-
-
-
 
     with open(path_to_file, "w") as r:
         for index, tag in enumerate(old_src_for_img):
-       # for index, tag in enumerate(soup.find_all('img')):
             tag['src'] = new_src_for_img[index]
-        
+
         for index, tag in enumerate(old_href_for_link):
             tag['href'] = new_href_for_link[index]
 
         r.write(soup.prettify(formatter="html5"))
-    
+
     return path_to_file
