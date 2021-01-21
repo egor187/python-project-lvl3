@@ -96,8 +96,45 @@ def link_download(request, download_path):
     return new_href_to_link_list
 
 
-def script_download():
-    pass
+
+
+
+def script_download(request, download_path):
+    soup = BeautifulSoup(request.text, 'html.parser')
+    new_src_to_script_list = []
+    for script in soup.find_all('script'):
+        if script.get("src"):
+
+            if urlparse(script.get('src')).scheme:
+                response = requests.get(script.get("src"))
+            elif not urlparse(script.get("src")).scheme:
+                response = requests.get(
+                    request.url + urlparse(
+                        script.get("src")
+                        ).path
+                    )
+
+            file_name = get_filename_from_tag(request.url, script.get('src'))
+
+            filename_from_script_link = os.path.join(
+                download_path,
+                file_name
+            )
+
+            if not urlparse(script.get('src')).scheme \
+                or urlparse(script.get('src')).scheme \
+                and urlparse(script.get('src')).netloc \
+                    == urlparse(request.url).netloc:
+
+                new_src_to_script_list.append(filename_from_script_link)
+
+                with open(filename_from_script_link, "w") as r:
+                    r.write(response.text)
+    return new_src_to_script_list
+
+    
+
+
 
 
 def download(url, download_path):
@@ -110,6 +147,7 @@ def download(url, download_path):
 
     new_src_for_img = img_download(request, path_to_dir)
     new_href_for_link = link_download(request, path_to_dir)
+    new_src_for_script = script_download(request, path_to_dir)
 
     soup = BeautifulSoup(request.text, "html.parser")
 
@@ -124,8 +162,10 @@ def download(url, download_path):
             or urlparse(tag.get('href')).scheme \
             and urlparse(tag.get('href')).netloc \
                 == urlparse(request.url).netloc:
-
             old_href_for_link.append(tag)
+
+    old_src_for_script = [script for script in soup.find_all("script") if script.get("src") and urlparse(script.get("src")).netloc == urlparse(request.url).netloc or not urlparse(script.get("src")).scheme]
+
 
     with open(path_to_file, "w") as r:
         for index, tag in enumerate(old_src_for_img):
@@ -134,6 +174,9 @@ def download(url, download_path):
         for index, tag in enumerate(old_href_for_link):
             tag['href'] = new_href_for_link[index]
 
-        r.write(soup.prettify(formatter="html5"))
+        for index, tag in enumerate(old_src_for_script):
+            tag['src'] = new_src_for_script[index]
 
+        r.write(soup.prettify(formatter="html5"))
+    
     return path_to_file
