@@ -161,7 +161,7 @@ def download(url, download_path):
         script for script in soup.find_all("script")
         if script.get("src")
         and urlparse(script.get("src")).netloc == urlparse(request.url).netloc
-        or not urlparse(script.get("src")).scheme
+        or script.get("src") and not urlparse(script.get("src")).scheme
     ]
 
     with open(path_to_file, "w") as r:
