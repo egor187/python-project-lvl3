@@ -127,28 +127,34 @@ def download(url, download_path):
     new_src_for_img = img_download(request, path_to_dir)
     
     new_href_for_link = link_download(request, path_to_dir)
+    
+
+
+    soup = BeautifulSoup(request.text, "html.parser")
+
+    old_src_for_img = []
+    for tag in soup.find_all("img"):
+        if tag.get("src") and not urlparse(tag.get('src')).scheme:
+            old_src_for_img.append(tag)
+
+    
+    old_href_for_link = []
+    for tag in soup.find_all('link'):
+        if not urlparse(tag.get('href')).scheme or urlparse(tag.get('href')).scheme and urlparse(tag.get('href')).netloc == urlparse(request.url).netloc:
+            old_href_for_link.append(tag)
+    
+
+
+
 
     with open(path_to_file, "w") as r:
-        soup = BeautifulSoup(request.text, "html.parser")
-        for index, tag in enumerate(soup.find_all('img')):
+        for index, tag in enumerate(old_src_for_img):
+       # for index, tag in enumerate(soup.find_all('img')):
             tag['src'] = new_src_for_img[index]
- 
-# NEED TO FILTER EXIST TAGS TO EVALUEATE WITH LEN OF NEW_LIST > EXCLUDE TAGS WITH FOREIGN NETLOC
-# REPLACE IT OUT OF CONTEXT MANAGER
-
-        old_href_for_link = []
-        for tag in soup.find_all('link'):
-            if not urlparse(tag.get('href')).scheme or urlparse(tag.get('href')).scheme and urlparse(tag.get('href')).netloc == urlparse(request.url).netloc:
-                old_href_for_link.append(tag)
         
         for index, tag in enumerate(old_href_for_link):
             tag['href'] = new_href_for_link[index]
 
-        #for index, tag in enumerate(soup.find_all('link')):
-        #    tag['href'] = new_href_for_link[index]
-
-
         r.write(soup.prettify(formatter="html5"))
     
-    #return new_href_for_link
     return path_to_file
