@@ -13,43 +13,41 @@ logger.setLevel(logging.DEBUG)
 debug_handler = logging.FileHandler(filename='./logging_debug.log', mode='w')
 debug_handler.setLevel(logging.DEBUG)
 
-warning_handler = logging.FileHandler(
-    filename='./logging_warnings.log', mode='w'
-)
-warning_handler.setLevel(logging.INFO)
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
 
 debug_formatter = logging.Formatter(
     '%(asctime)s -%(name)s - %(levelname)s - %(message)s'
 )
-warning_formatter = logging.Formatter('%(asctime)s -%(name)s - %(message)s')
+stream_formatter = logging.Formatter('%(message)s')
 
 debug_handler.setFormatter(debug_formatter)
-warning_handler.setFormatter(warning_formatter)
+stream_handler.setFormatter(stream_formatter)
 
 logger.addHandler(debug_handler)
-logger.addHandler(warning_handler)
+logger.addHandler(stream_handler)
 
 
 def get_filename_from_tag(url, source):
     url_parsed = urlparse(url)
-    logger.info('parsing url')
+    logger.debug('parsing url')
     netloc = re.sub(r'[\W+?]', '-', url_parsed.netloc)
     tag_without_scheme = urlparse(source).path
     filename_from_tag = netloc + re.sub(r'[/+?]', '-', tag_without_scheme)
-    logger.info('creating filename from <tag> for downloading')
+    logger.debug('creating filename from <tag> for downloading')
     return filename_from_tag
 
 
 def get_filename_from_url(source):
     request = requests.get(source)
-    logger.warning('getting URL for download html')
+    logger.debug('getting URL for download html')
     url_without_schema = re.search(r'^(https?://)(\S+)', request.url).group(2)
     last_slash_cutted_url = url_without_schema[:-1] \
         if url_without_schema[-1] == "/"\
         else url_without_schema
 
     file_name_from_url = re.sub(r'[\W+?]', '-', last_slash_cutted_url)
-    logger.info('creating filename for downloaded html')
+    logger.debug('creating filename for downloaded html')
     return file_name_from_url
 
 
@@ -59,7 +57,7 @@ def get_content_type(url):
             r'/(\S+);',
             request.headers['Content-Type']
             ).group(1)
-    logger.info('check content-type from server response')
+    logger.debug('check content-type from server response')
     return content_type
 
 
@@ -67,7 +65,7 @@ def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_img_list = []
     for link in soup.find_all('img'):
-        logger.info('check for having "src" atribute in tag <img>')
+        logger.debug('check for having "src" atribute in tag <img>')
         if link.get('src') and not urlparse(link.get('src')).scheme:
             response = requests.get(
                 request.url + urlparse(
@@ -83,8 +81,8 @@ def img_download(request, download_path):
             )
         new_src_to_img_list.append(filename_from_img_link)
         with open(filename_from_img_link, "wb") as r:
-            logger.info(f'downloading image "{link}"')
-            logger.warning('may occur error if dir for download already exist')
+            logger.debug(f'downloading image "{link}"')
+            logger.debug('may occur error if dir for download already exist')
             r.write(response.content)
     return new_src_to_img_list
 
@@ -104,7 +102,7 @@ def link_download(request, download_path):
                 )
 
         if not os.path.splitext(link.get('href'))[1]:
-            logger.warning(
+            logger.debug(
                 'may occur error about ext of file'
                 'in case where "href" attribute is None'
             )
@@ -128,7 +126,7 @@ def link_download(request, download_path):
             new_href_to_link_list.append(filename_from_link_link)
 
             with open(filename_from_link_link, "wb") as r:
-                logger.info(f'downloading link "{link}"')
+                logger.debug(f'downloading link "{link}"')
                 r.write(response.content)
     return new_href_to_link_list
 
@@ -163,7 +161,7 @@ def script_download(request, download_path):
                 new_src_to_script_list.append(filename_from_script_link)
 
                 with open(filename_from_script_link, "w") as r:
-                    logger.info(f'downloading script "{script}"')
+                    logger.debug(f'downloading script "{script}"')
                     r.write(response.text)
     return new_src_to_script_list
 
@@ -177,8 +175,11 @@ def download(url, download_path):
     os.mkdir(path_to_dir)
 
     new_src_for_img = img_download(request, path_to_dir)
+    logger.info('Downloading images')
     new_href_for_link = link_download(request, path_to_dir)
+    logger.info('Downloading links')
     new_src_for_script = script_download(request, path_to_dir)
+    logger.info('Downloading scripts')
 
     soup = BeautifulSoup(request.text, "html.parser")
 
@@ -203,16 +204,17 @@ def download(url, download_path):
     ]
 
     with open(path_to_file, "w") as r:
+        logger.info('Downloading html')
         for index, tag in enumerate(old_src_for_img):
             tag['src'] = new_src_for_img[index]
-            logger.info('substitution source for img to downloaded')
+            logger.debug('substitution source for img to downloaded')
 
         for index, tag in enumerate(old_href_for_link):
-            logger.info('substitution source for link to downloaded')
+            logger.debug('substitution source for link to downloaded')
             tag['href'] = new_href_for_link[index]
 
         for index, tag in enumerate(old_src_for_script):
-            logger.info('substitution source for script to downloaded')
+            logger.debug('substitution source for script to downloaded')
             tag['src'] = new_src_for_script[index]
 
         r.write(soup.prettify(formatter="html5"))
