@@ -10,11 +10,11 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-debug_handler = logging.FileHandler(filename='./logging/debug.log', mode='w')
+debug_handler = logging.FileHandler(filename='./logging_debug.log', mode='w')
 debug_handler.setLevel(logging.DEBUG)
 
 warning_handler = logging.FileHandler(
-    filename='./logging/warnings.log', mode='w'
+    filename='./logging_warnings.log', mode='w'
 )
 warning_handler.setLevel(logging.INFO)
 
