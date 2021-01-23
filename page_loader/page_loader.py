@@ -31,7 +31,7 @@ logger.addHandler(stream_handler)
 def get_filename_from_tag(url, source):
     url_parsed = urlparse(url)
     logger.debug('parsing url')
-    netloc = re.sub(r'[\W+?]', '-', url_parsed.netloc)
+    netloc = re.sub(r'[\W+_?]', '-', url_parsed.netloc)
     tag_without_scheme = urlparse(source).path
     filename_from_tag = netloc + re.sub(r'[/+?]', '-', tag_without_scheme)
     logger.debug('creating filename from <tag> for downloading')
@@ -79,11 +79,13 @@ def img_download(request, download_path):
                     link.get('src')
                 )
             )
-        new_src_to_img_list.append(filename_from_img_link)
-        with open(filename_from_img_link, "wb") as r:
-            logger.debug(f'downloading image "{link}"')
-            logger.debug('may occur error if dir for download already exist')
-            r.write(response.content)
+        #else:
+        #    raise ConnectionAbortedError("Some error")
+            new_src_to_img_list.append(filename_from_img_link)
+            with open(filename_from_img_link, "wb") as r:
+                logger.debug(f'downloading image "{link}"')
+                logger.debug('may occur error if dir for download already exist')
+                r.write(response.content)
     return new_src_to_img_list
 
 

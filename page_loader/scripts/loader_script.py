@@ -40,28 +40,28 @@ def main():
         sys.exit(1)
     except requests.exceptions.ConnectionError as exc:
         print(
-            f"Some serious problems with connection occur. Error is: {exc}"
+            f"Some serious problems with connection occur. Error is: {exc}. "
             f"Check out your connection"
         )
         sys.exit(1)
     except OSError as os_error:
         if os_error.errno == 2:
             print(
-                f"There is no such file or directory."
+                f"There is no such file or directory. "
                 f"Error is: {os_error}"
             )
         elif os_error.errno == 20:
             print(
-                f"Path to download isn't correct."
-                f"It's not a directory. Error is: {os_error}"
+                f"Path to download isn't correct. "
+                f"It's not a directory. Error is: {os_error}."
             )
         elif os_error.errno == 17:
             print(
-                f"Same file already exist."
-                f"Try another file_name. Error is: {os_error}"
+                f"Same file already exist. "
+                f"Try another file_name. Error is: {os_error}."
             )
         else:
-            print(f"Some OS error occured. Error is: {os_error}")
+            print(f"Some OS error occured. Error is: {os_error}.")
 
 
 if __name__ == "__main__":
