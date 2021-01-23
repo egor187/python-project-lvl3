@@ -168,6 +168,13 @@ def script_download(request, download_path):
 
 def download(url, download_path):
     request = requests.get(url)
+
+    if request.status_code != 200:
+        raise ConnectionAbortedError(
+            f"Status-code of server-response "
+            f"from '{request.url}' is '{request.status_code}'"
+        )
+
     file_name = get_filename_from_url(url)
     path = os.path.join(download_path, file_name)
     path_to_file = path + '.html'
