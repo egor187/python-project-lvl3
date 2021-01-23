@@ -21,9 +21,10 @@ def test_file_html_create():
 def test_correct_link_list():
     with tempfile.TemporaryDirectory() as tmpdir:
         url = "https://ru.hexlet.io/courses"
-        expected_href = [os.path.join(tmpdir, 'ru-hexlet-io-lessons.rss'),
-                os.path.join(tmpdir, 'ru-hexlet-io-courses.html'),
-                ]
+        expected_href = [
+            os.path.join(tmpdir, 'ru-hexlet-io-lessons.rss'),
+            os.path.join(tmpdir, 'ru-hexlet-io-courses.html'),
+        ]
         real_href = link_download(requests.get(url), tmpdir)
 
         assert expected_href == real_href
