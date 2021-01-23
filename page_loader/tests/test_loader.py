@@ -2,7 +2,8 @@ import os.path
 import os
 import tempfile
 import requests
-# import requests_mock
+import requests_mock
+import pytest
 # from bs4 import BeautifulSoup
 from page_loader import download, link_download
 
@@ -29,6 +30,14 @@ def test_correct_link_list():
 
         assert expected_href == real_href
 
+
+def test_isexceptions_handled(tmp_path):
+    with requests_mock.Mocker() as m:
+        url = "https://ru.hexlet.io/courses"
+        m.get(url, status_code=100)
+        with pytest.raises(ConnectionAbortedError) as err:
+            download(url, tmp_path)
+    
 
 # def test_file_html_content(tmp_path):
 #    url = "https://page-loader.hexlet.repl.co"
