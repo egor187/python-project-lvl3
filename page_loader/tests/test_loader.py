@@ -1,10 +1,10 @@
 import os.path
 import os
 import tempfile
-# import requests
+import requests
 # import requests_mock
 # from bs4 import BeautifulSoup
-from page_loader import download
+from page_loader import download, link_download
 
 
 def test_file_html_create():
@@ -18,23 +18,16 @@ def test_file_html_create():
         assert download('https://ru.hexlet.io/courses', tmpdir) == path
 
 
-# def test_correct_link_list(tmp_path):
-#    url = "https://ru.hexlet.io/courses"
-#    expected_href = [
-#            tmp_path / 'ru-hexlet-io-lessons.rss',
-#            tmp_path / 'ru-hexlet-io-courses.html'
-#            ]
-#
-#    download(url, tmp_path)
-#
-#    example = open(tmp_path / "ru-hexlet-io-courses.html", "r").read()
-#
-#    real_list = []
-#    soup = BeautifulSoup(example, "html.parser")
-#    for tag in soup.find_all("link"):
-#        real_list.append(tag.get("href"))
-#
-#    assert expected_href == real_list
+def test_correct_link_list():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        url = "https://ru.hexlet.io/courses"
+        expected_href = [os.path.join(tmpdir, 'ru-hexlet-io-lessons.rss'),
+                os.path.join(tmpdir, 'ru-hexlet-io-courses.html'),
+                ]
+        real_href = link_download(requests.get(url), tmpdir)
+
+        assert expected_href == real_href
+
 
 # def test_file_html_content(tmp_path):
 #    url = "https://page-loader.hexlet.repl.co"
