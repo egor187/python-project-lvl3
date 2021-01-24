@@ -4,7 +4,6 @@ import tempfile
 import requests
 import requests_mock
 import pytest
-# from bs4 import BeautifulSoup
 from page_loader import download, link_download
 
 
@@ -35,21 +34,8 @@ def test_isexceptions_handled(tmp_path):
     with requests_mock.Mocker() as m:
         url = "https://ru.hexlet.io/courses"
         m.get(url, status_code=100)
-        with pytest.raises(ConnectionAbortedError) as err:
+        with pytest.raises(ConnectionAbortedError):
             download(url, tmp_path)
-    
-
-# def test_file_html_content(tmp_path):
-#    url = "https://page-loader.hexlet.repl.co"
-#    request = requests.get(url)
-#    soup = BeautifulSoup(request.text, "html.parser")
-#
-#    download(url, tmp_path)
-#
-#    expected_file_name = tmp_path / "page-loader-hexlet-repl-co.html"
-#    real = soup.prettify(formatter = "html5")
-#
-#    assert open(expected_file_name, "r").read() == real
 
 
 def test_iscorrect_dir_name():

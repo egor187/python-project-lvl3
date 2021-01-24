@@ -4,6 +4,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
+from progress.spinner import Spinner
 import logging
 
 
@@ -64,107 +65,128 @@ def get_content_type(url):
 def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_img_list = []
-    for link in soup.find_all('img'):
-        logger.debug('check for having "src" atribute in tag <img>')
-        if link.get('src') and not urlparse(link.get('src')).scheme:
-            response = requests.get(
-                request.url + urlparse(
-                    link.get('src')
-                    ).path
+    spinner = Spinner('Loading images')
+    state = 'go'
+    while state != 'FINISHED':
+        for link in soup.find_all('img'):
+            logger.debug('check for having "src" atribute in tag <img>')
+            if link.get('src') and not urlparse(link.get('src')).scheme:
+                response = requests.get(
+                    request.url + urlparse(
+                        link.get('src')
+                        ).path
+                    )
+                filename_from_img_link = os.path.join(
+                    download_path,
+                    get_filename_from_tag(
+                        request.url,
+                        link.get('src')
+                    )
                 )
-            filename_from_img_link = os.path.join(
-                download_path,
-                get_filename_from_tag(
-                    request.url,
-                    link.get('src')
-                )
-            )
-            new_src_to_img_list.append(filename_from_img_link)
-            with open(filename_from_img_link, "wb") as r:
-                logger.debug(f'downloading image "{link}"')
-                logger.debug(
-                    'may occur error if dir for download already exist'
-                )
-                r.write(response.content)
+                new_src_to_img_list.append(filename_from_img_link)
+                with open(filename_from_img_link, "wb") as r:
+                    logger.debug(f'downloading image "{link}"')
+                    logger.debug(
+                        'may occur error if dir for download already exist'
+                    )
+                    r.write(response.content)
+                    spinner.next()
+        state = "FINISHED"
     return new_src_to_img_list
 
 
 def link_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_href_to_link_list = []
-    for link in soup.find_all('link'):
+    spinner = Spinner('Loading links')
+    state = 'go'
+    while state != 'FINISHED':
+        for link in soup.find_all('link'):
 
-        if urlparse(link.get('href')).scheme:
-            response = requests.get(link.get("href"))
-        elif not urlparse(link.get("href")).scheme:
-            response = requests.get(
-                request.url + urlparse(
-                    link.get("href")
-                    ).path
+            if urlparse(link.get('href')).scheme:
+                response = requests.get(link.get("href"))
+            elif not urlparse(link.get("href")).scheme:
+                response = requests.get(
+                    request.url + urlparse(
+                        link.get("href")
+                        ).path
+                    )
+
+            if not os.path.splitext(link.get('href'))[1]:
+                logger.debug(
+                    'may occur error about ext of file'
+                    'in case where "href" attribute is None'
+                )
+                file_name = get_filename_from_tag(
+                    request.url,
+                    link.get('href')
+                ) + '.html'  # TODO refactor
+            elif os.path.splitext(link.get('href'))[1]:
+                file_name = get_filename_from_tag(
+                    request.url,
+                    link.get('href')
                 )
 
-        if not os.path.splitext(link.get('href'))[1]:
-            logger.debug(
-                'may occur error about ext of file'
-                'in case where "href" attribute is None'
+            filename_from_link_link = os.path.join(
+                download_path,
+                file_name
             )
-            file_name = get_filename_from_tag(
-                request.url,
-                link.get('href')
-            ) + '.html'  # TODO refactor
-        elif os.path.splitext(link.get('href'))[1]:
-            file_name = get_filename_from_tag(request.url, link.get('href'))
 
-        filename_from_link_link = os.path.join(
-            download_path,
-            file_name
-        )
+            if not urlparse(link.get('href')).scheme \
+                or urlparse(link.get('href')).scheme \
+                and urlparse(link.get('href')).netloc \
+                    == urlparse(request.url).netloc:
 
-        if not urlparse(link.get('href')).scheme \
-            or urlparse(link.get('href')).scheme \
-            and urlparse(link.get('href')).netloc \
-                == urlparse(request.url).netloc:
+                new_href_to_link_list.append(filename_from_link_link)
 
-            new_href_to_link_list.append(filename_from_link_link)
-
-            with open(filename_from_link_link, "wb") as r:
-                logger.debug(f'downloading link "{link}"')
-                r.write(response.content)
+                with open(filename_from_link_link, "wb") as r:
+                    logger.debug(f'downloading link "{link}"')
+                    r.write(response.content)
+                    spinner.next()
+        state = "FINISHED"
     return new_href_to_link_list
 
 
 def script_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_script_list = []
-    for script in soup.find_all('script'):
-        if script.get("src"):
+    spinner = Spinner('Loading scripts')
+    state = 'go'
+    while state != 'FINISHED':
+        for script in soup.find_all('script'):
+            if script.get("src"):
 
-            if urlparse(script.get('src')).scheme:
-                response = requests.get(script.get("src"))
-            elif not urlparse(script.get("src")).scheme:
-                response = requests.get(
-                    request.url + urlparse(
-                        script.get("src")
-                        ).path
-                    )
+                if urlparse(script.get('src')).scheme:
+                    response = requests.get(script.get("src"))
+                elif not urlparse(script.get("src")).scheme:
+                    response = requests.get(
+                        request.url + urlparse(
+                            script.get("src")
+                            ).path
+                        )
 
-            file_name = get_filename_from_tag(request.url, script.get('src'))
+                file_name = get_filename_from_tag(
+                    request.url,
+                    script.get('src')
+                )
 
-            filename_from_script_link = os.path.join(
-                download_path,
-                file_name
-            )
+                filename_from_script_link = os.path.join(
+                    download_path,
+                    file_name
+                )
 
-            if not urlparse(script.get('src')).scheme \
-                or urlparse(script.get('src')).scheme \
-                and urlparse(script.get('src')).netloc \
-                    == urlparse(request.url).netloc:
+                if not urlparse(script.get('src')).scheme \
+                    or urlparse(script.get('src')).scheme \
+                    and urlparse(script.get('src')).netloc \
+                        == urlparse(request.url).netloc:
 
-                new_src_to_script_list.append(filename_from_script_link)
+                    new_src_to_script_list.append(filename_from_script_link)
 
-                with open(filename_from_script_link, "w") as r:
-                    logger.debug(f'downloading script "{script}"')
-                    r.write(response.text)
+                    with open(filename_from_script_link, "w") as r:
+                        logger.debug(f'downloading script "{script}"')
+                        r.write(response.text)
+                        spinner.next()
+        state = "FINISHED"
     return new_src_to_script_list
 
 
@@ -184,11 +206,11 @@ def download(url, download_path):
     os.mkdir(path_to_dir)
 
     new_src_for_img = img_download(request, path_to_dir)
-    logger.info('Downloading images')
+    logger.info('\nimages downloaded')
     new_href_for_link = link_download(request, path_to_dir)
-    logger.info('Downloading links')
+    logger.info('\nlinks downloaded')
     new_src_for_script = script_download(request, path_to_dir)
-    logger.info('Downloading scripts')
+    logger.info('\nscripts downloaded')
 
     soup = BeautifulSoup(request.text, "html.parser")
 
