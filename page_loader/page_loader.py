@@ -71,7 +71,7 @@ def img_download(request, download_path):
         for link in soup.find_all('img'):
             logger.debug('check for having "src" atribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
-                #response = requests.get(
+                # response = requests.get(
                 #    request.url + urlparse(
                 #        link.get('src')
                 #        ).path
@@ -101,7 +101,8 @@ def img_download(request, download_path):
     return new_src_to_img_list
 
 
-def link_download(request, download_path):
+def link_download(url, download_path):
+    request = requests.get(url)
     soup = BeautifulSoup(request.text, 'html.parser')
     new_href_to_link_list = []
     spinner = Spinner('Loading links')
@@ -112,14 +113,14 @@ def link_download(request, download_path):
             if urlparse(link.get('href')).scheme:
                 response = requests.get(link.get("href"))
             elif not urlparse(link.get("href")).scheme:
-                #response = requests.get(
+                # response = requests.get(
                 #    request.url + urlparse(
                 #        link.get("href")
                 #        ).path
                 #    )
 
                 response = requests.get(urljoin(
-                    request.url, urlparse(
+                    url, urlparse(
                         link.get("href")
                         ).path
                     ))
@@ -129,12 +130,12 @@ def link_download(request, download_path):
                     'in case where "href" attribute is None'
                 )
                 file_name = get_filename_from_tag(
-                    request.url,
+                    url,
                     link.get('href')
                 ) + '.html'  # TODO refactor
             elif os.path.splitext(link.get('href'))[1]:
                 file_name = get_filename_from_tag(
-                    request.url,
+                    url,
                     link.get('href')
                 )
 
@@ -146,7 +147,7 @@ def link_download(request, download_path):
             if not urlparse(link.get('href')).scheme \
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
-                    == urlparse(request.url).netloc:
+                    == urlparse(url).netloc:
 
                 new_href_to_link_list.append(filename_from_link_link)
 
@@ -170,7 +171,7 @@ def script_download(request, download_path):
                 if urlparse(script.get('src')).scheme:
                     response = requests.get(script.get("src"))
                 elif not urlparse(script.get("src")).scheme:
-                    #response = requests.get(
+                    # response = requests.get(
                     #    request.url + urlparse(
                     #        script.get("src")
                     #        ).path
@@ -208,7 +209,7 @@ def script_download(request, download_path):
 
 def download(url, download_path):
     request = requests.get(url)
-    
+
     if not request:
         raise TypeError(f"Not valid url for '{request.url}'")
     if request.status_code != 200:
@@ -225,7 +226,7 @@ def download(url, download_path):
 
     new_src_for_img = img_download(request, path_to_dir)
     logger.info('\nimages downloaded')
-    new_href_for_link = link_download(request, path_to_dir)
+    new_href_for_link = link_download(url, path_to_dir)
     logger.info('\nlinks downloaded')
     new_src_for_script = script_download(request, path_to_dir)
     logger.info('\nscripts downloaded')
