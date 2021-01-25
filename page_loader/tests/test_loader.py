@@ -61,6 +61,16 @@ def test_iscorrect_img_name():
         )
         assert os.path.isfile(expect_img_file_name)
 
+#def test_hexlet_check():
+#    expected_html_file_path = get_fixture_path(
+#            os.path.join('expected', HTML_FILE_NAME),
+#            )
+#    expected_html_content = read(expected_html_file_path)
+#    with tempfile.TemporaryDirectory() as tmpdirname:
+#        assert not os.listdir(tmpdirname)
+#        process = run_app(PAGE_URL, tmpdirname)
+#        assert process.returncode == 0
+
 
 # def test_iscorrect_img_content(tmp_path):
 #    url = "https://ru.hexlet.io/courses"
