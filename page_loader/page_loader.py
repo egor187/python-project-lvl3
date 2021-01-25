@@ -101,8 +101,7 @@ def img_download(request, download_path):
     return new_src_to_img_list
 
 
-def link_download(url, download_path):
-    request = requests.get(url)
+def link_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_href_to_link_list = []
     spinner = Spinner('Loading links')
@@ -120,7 +119,7 @@ def link_download(url, download_path):
                 #    )
 
                 response = requests.get(urljoin(
-                    url, urlparse(
+                    request.url, urlparse(
                         link.get("href")
                         ).path
                     ))
@@ -130,12 +129,12 @@ def link_download(url, download_path):
                     'in case where "href" attribute is None'
                 )
                 file_name = get_filename_from_tag(
-                    url,
+                    request.url,
                     link.get('href')
                 ) + '.html'  # TODO refactor
             elif os.path.splitext(link.get('href'))[1]:
                 file_name = get_filename_from_tag(
-                    url,
+                    request.url,
                     link.get('href')
                 )
 
@@ -147,13 +146,13 @@ def link_download(url, download_path):
             if not urlparse(link.get('href')).scheme \
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
-                    == urlparse(url).netloc:
+                    == urlparse(request.url).netloc:
 
                 new_href_to_link_list.append(filename_from_link_link)
 
-                with open(filename_from_link_link, "wb") as r:
+                with open(filename_from_link_link, "w") as r:
                     logger.debug(f'downloading link "{link}"')
-                    r.write(response.content)
+                    r.write(response.text)
                     spinner.next()
         state = "FINISHED"
     return new_href_to_link_list
@@ -226,7 +225,7 @@ def download(url, download_path):
 
     new_src_for_img = img_download(request, path_to_dir)
     logger.info('\nimages downloaded')
-    new_href_for_link = link_download(url, path_to_dir)
+    new_href_for_link = link_download(request, path_to_dir)
     logger.info('\nlinks downloaded')
     new_src_for_script = script_download(request, path_to_dir)
     logger.info('\nscripts downloaded')
