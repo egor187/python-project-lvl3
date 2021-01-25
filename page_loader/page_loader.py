@@ -155,6 +155,7 @@ def link_download(request, download_path):
                     r.write(response.text)
                     spinner.next()
         state = "FINISHED"
+        w
     return new_href_to_link_list
 
 
