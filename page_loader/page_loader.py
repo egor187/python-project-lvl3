@@ -112,12 +112,17 @@ def link_download(request, download_path):
             if urlparse(link.get('href')).scheme:
                 response = requests.get(link.get("href"))
             elif not urlparse(link.get("href")).scheme:
-                response = requests.get(
-                    request.url + urlparse(
+                #response = requests.get(
+                #    request.url + urlparse(
+                #        link.get("href")
+                #        ).path
+                #    )
+
+                response = requests.get(urljoin(
+                    request.url, urlparse(
                         link.get("href")
                         ).path
-                    )
-
+                    ))
             if not os.path.splitext(link.get('href'))[1]:
                 logger.debug(
                     'may occur error about ext of file'
@@ -165,12 +170,17 @@ def script_download(request, download_path):
                 if urlparse(script.get('src')).scheme:
                     response = requests.get(script.get("src"))
                 elif not urlparse(script.get("src")).scheme:
-                    response = requests.get(
-                        request.url + urlparse(
+                    #response = requests.get(
+                    #    request.url + urlparse(
+                    #        script.get("src")
+                    #        ).path
+                    #    )
+
+                    response = requests.get(urljoin(
+                        request.url, urlparse(
                             script.get("src")
                             ).path
-                        )
-
+                        ))
                 file_name = get_filename_from_tag(
                     request.url,
                     script.get('src')
