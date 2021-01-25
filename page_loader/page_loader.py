@@ -91,6 +91,8 @@ def img_download(request, download_path):
                     )
                     r.write(response.content)
                     spinner.next()
+            else:
+                response = None
         state = "FINISHED"
     return new_src_to_img_list
 
@@ -192,7 +194,9 @@ def script_download(request, download_path):
 
 def download(url, download_path):
     request = requests.get(url)
-
+    
+    if not request:
+        raise TypeError(f"Not valid url for '{request.url}'")
     if request.status_code != 200:
         raise ConnectionAbortedError(
             f"Status-code of server-response "
