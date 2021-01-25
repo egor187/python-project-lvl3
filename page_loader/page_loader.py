@@ -3,7 +3,7 @@ import os.path
 import re
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 from progress.spinner import Spinner
 import logging
 
@@ -71,11 +71,16 @@ def img_download(request, download_path):
         for link in soup.find_all('img'):
             logger.debug('check for having "src" atribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
-                response = requests.get(
-                    request.url + urlparse(
+                #response = requests.get(
+                #    request.url + urlparse(
+                #        link.get('src')
+                #        ).path
+                #    )
+                response = requests.get(urljoin(
+                    request.url, urlparse(
                         link.get('src')
                         ).path
-                    )
+                    ))
                 filename_from_img_link = os.path.join(
                     download_path,
                     get_filename_from_tag(
@@ -83,6 +88,7 @@ def img_download(request, download_path):
                         link.get('src')
                     )
                 )
+
                 new_src_to_img_list.append(filename_from_img_link)
                 with open(filename_from_img_link, "wb") as r:
                     logger.debug(f'downloading image "{link}"')
@@ -91,8 +97,6 @@ def img_download(request, download_path):
                     )
                     r.write(response.content)
                     spinner.next()
-            else:
-                response = None
         state = "FINISHED"
     return new_src_to_img_list
 
