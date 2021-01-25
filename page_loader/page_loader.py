@@ -109,7 +109,7 @@ def link_download(request, download_path):
     while state != 'FINISHED':
         for link in soup.find_all('link'):
 
-            if urlparse(link.get('href')).scheme:
+            if urlparse(link.get('href')).scheme and urlparse(link.get('href')).netloc:
                 response = requests.get(link.get("href"))
             elif not urlparse(link.get("href")).scheme:
                 # response = requests.get(
@@ -155,7 +155,6 @@ def link_download(request, download_path):
                     r.write(response.text)
                     spinner.next()
         state = "FINISHED"
-        w
     return new_href_to_link_list
 
 
