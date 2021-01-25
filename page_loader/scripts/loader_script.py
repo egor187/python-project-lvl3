@@ -37,13 +37,13 @@ def main():
     except ConnectionAbortedError as conn_exc:
         logger.exception(msg='exception about status_code')
         print(conn_exc)
-        sys.exit(0)
+        sys.exit(1)
     except requests.exceptions.ConnectionError as exc:
         print(
             f"Some serious problems with connection occur. Error is: {exc}. "
             f"Check out your connection"
         )
-        sys.exit(0)
+        sys.exit(1)
     except OSError as os_error:
         if os_error.errno == 2:
             print(
@@ -62,6 +62,8 @@ def main():
             )
         else:
             print(f"Some OS error occured. Error is: {os_error}.")
+    else:
+        sys.exit(0)
 
 
 if __name__ == "__main__":
