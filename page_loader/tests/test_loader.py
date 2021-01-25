@@ -61,7 +61,7 @@ def test_iscorrect_img_name():
         )
         assert os.path.isfile(expect_img_file_name)
 
-#def test_hexlet_check():
+# def test_hexlet_check():
 #    expected_html_file_path = get_fixture_path(
 #            os.path.join('expected', HTML_FILE_NAME),
 #            )
