@@ -42,7 +42,7 @@ def get_filename_from_tag(url, source):
 def get_filename_from_url(url):
     logger.debug('getting URL for download html')
     url_without_schema = re.search(r'^(https?://)(\S+)', url).group(2)
-    #last_slash_cutted_url = url_without_schema[:-1] \
+    # last_slash_cutted_url = url_without_schema[:-1] \
     #    if url_without_schema[-1] == "/"\
     #    else url_without_schema
     last_slash_cutted_url = url_without_schema
@@ -80,7 +80,7 @@ def img_download(request, download_path):
                 #        link.get('src')
                 #        ).path
                 #    )
-                #response = requests.get(urljoin(
+                # response = requests.get(urljoin(
                 #    request.url, urlparse(
                 #        link.get('src')
                 #        ).path
@@ -89,7 +89,7 @@ def img_download(request, download_path):
                 response = requests.get(urljoin(
                     request.url, link.get('src')
                         ))
-                
+
                 filename_from_img_link = os.path.join(
                     download_path,
                     get_filename_from_tag(
@@ -118,32 +118,36 @@ def link_download(request, download_path):
     while state != 'FINISHED':
         for link in soup.find_all('link'):
 
-            #if urlparse(link.get('href')).scheme\
+            # if urlparse(link.get('href')).scheme\
             #        and urlparse(link.get('href')).netloc:
             #    response = requests.get(link.get("href"))
-            #elif not urlparse(link.get("href")).scheme:
+            # elif not urlparse(link.get("href")).scheme:
                 # response = requests.get(
                 #    request.url + urlparse(
                 #        link.get("href")
                 #        ).path
                 #    )
-                #response = requests.get(urljoin(
+                # response = requests.get(urljoin(
                 #    request.url, urlparse(
                 #        link.get("href")
                 #        ).path
                 #    ))
 
-                #response = requests.get(urljoin(
+                # response = requests.get(urljoin(
                 #    request.url, link.get("href")
                 #    ))
             
-            if link.get('href').startswith('/'):
-                response = requests.get(request.url + link.get('href'))
-            else:
-                response = requests.get(urljoin(request.url, link.get('href')))
-            #response = requests.get(urljoin(
-            #    request.url, link.get("href")
-            #    ))
+            if not urlparse(link.get('href')).scheme \
+                or urlparse(link.get('href')).scheme \
+                and urlparse(link.get('href')).netloc \
+                    == urlparse(request.url).netloc:
+
+                response = requests.get(
+                    urljoin(
+                        request.url,
+                        link.get("href")
+                    )
+                )
 
             if not os.path.splitext(link.get('href'))[1]:
                 logger.debug(
