@@ -111,7 +111,8 @@ def link_download(request, download_path):
 
             if urlparse(link.get('href')).scheme\
                     and urlparse(link.get('href')).netloc:
-                response = requests.get(link.get("href"))
+                #response = requests.get(link.get("href"))
+                response = requests.get(f"{urlparse(link.get('href')).scheme}://{urlparse(link.get('href')).netloc}{link}")
             elif not urlparse(link.get("href")).scheme:
                 # response = requests.get(
                 #    request.url + urlparse(
