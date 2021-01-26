@@ -64,7 +64,7 @@ def main():
             print(f"Some OS error occured. Error is: {os_error}.")
 
     except BaseException:
-        raise
+        print('Bingo')
     else:
         sys.exit(0)
 
