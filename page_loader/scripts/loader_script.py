@@ -34,6 +34,7 @@ def main():
 
     try:
         print(download(ie_source, output))
+        sys.exit(0)
     except ConnectionAbortedError as conn_exc:
         logger.exception(msg='exception about status_code')
         print(conn_exc)
