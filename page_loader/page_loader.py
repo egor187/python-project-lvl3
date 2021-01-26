@@ -180,9 +180,9 @@ def link_download(request, download_path):
                 
                 new_href_to_link_list.append(file_name)
 
-                with open(os.path.join(download_path, file_name), "w") as r:
+                with open(os.path.join(download_path, file_name), "wb") as r:
                     logger.debug(f'downloading link "{link}"')
-                    r.write(response.text)
+                    r.write(response.content)
                     spinner.next()
         state = "FINISHED"
     return new_href_to_link_list
