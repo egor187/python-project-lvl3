@@ -37,12 +37,14 @@ def main():
     except ConnectionAbortedError as conn_exc:
         logger.exception(msg='exception about status_code')
         print(conn_exc)
+        raise SystemExit
 
     except requests.exceptions.ConnectionError as exc:
         print(
             f"Some serious problems with connection occur. Error is: {exc}. "
             f"Check out your connection"
         )
+        raise SystemExit
 
     except OSError as os_error:
         if os_error.errno == 2:
@@ -62,11 +64,7 @@ def main():
             )
         else:
             print(f"Some OS error occured. Error is: {os_error}.")
-
-    except BaseException:
-        print('Bingo')
-    else:
-        sys.exit(0)
+        raise SystemExit
 
 
 if __name__ == "__main__":
