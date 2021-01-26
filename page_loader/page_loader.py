@@ -301,7 +301,6 @@ def download(url, download_path):
             logger.debug('substitution source for script to downloaded')
             tag['src'] = new_src_for_script[index]
 
-        #r.write(soup.prettify(formatter="html5"))
-        r.write(str(soup))
+        r.write(soup.prettify(formatter="html5"))
 
     return path_to_file
