@@ -39,14 +39,13 @@ def get_filename_from_tag(url, source):
     return filename_from_tag
 
 
-def get_filename_from_url(source):
-    request = requests.get(source)
+def get_filename_from_url(url):
     logger.debug('getting URL for download html')
-    url_without_schema = re.search(r'^(https?://)(\S+)', request.url).group(2)
-    last_slash_cutted_url = url_without_schema[:-1] \
-        if url_without_schema[-1] == "/"\
-        else url_without_schema
-
+    url_without_schema = re.search(r'^(https?://)(\S+)', url).group(2)
+    #last_slash_cutted_url = url_without_schema[:-1] \
+    #    if url_without_schema[-1] == "/"\
+    #    else url_without_schema
+    last_slash_cutted_url = url_without_schema
     file_name_from_url = re.sub(r'[\W+?]', '-', last_slash_cutted_url)
     logger.debug('creating filename for downloaded html')
     return file_name_from_url
@@ -60,6 +59,11 @@ def get_content_type(url):
             ).group(1)
     logger.debug('check content-type from server response')
     return content_type
+
+
+def get_content(url):
+    request = requests.get(url)
+    return request
 
 
 def img_download(request, download_path):
@@ -76,11 +80,16 @@ def img_download(request, download_path):
                 #        link.get('src')
                 #        ).path
                 #    )
+                #response = requests.get(urljoin(
+                #    request.url, urlparse(
+                #        link.get('src')
+                #        ).path
+                #    ))
+
                 response = requests.get(urljoin(
-                    request.url, urlparse(
-                        link.get('src')
-                        ).path
-                    ))
+                    request.url, link.get('src')
+                        ))
+                
                 filename_from_img_link = os.path.join(
                     download_path,
                     get_filename_from_tag(
@@ -109,21 +118,29 @@ def link_download(request, download_path):
     while state != 'FINISHED':
         for link in soup.find_all('link'):
 
-            if urlparse(link.get('href')).scheme\
-                    and urlparse(link.get('href')).netloc:
-                #response = requests.get(link.get("href"))
-                response = requests.get(f"{urlparse(link.get('href')).scheme}://{urlparse(link.get('href')).netloc}{link}")
-            elif not urlparse(link.get("href")).scheme:
+            #if urlparse(link.get('href')).scheme\
+            #        and urlparse(link.get('href')).netloc:
+            #    response = requests.get(link.get("href"))
+            #elif not urlparse(link.get("href")).scheme:
                 # response = requests.get(
                 #    request.url + urlparse(
                 #        link.get("href")
                 #        ).path
                 #    )
-                response = requests.get(urljoin(
-                    request.url, urlparse(
-                        link.get("href")
-                        ).path
-                    ))
+                #response = requests.get(urljoin(
+                #    request.url, urlparse(
+                #        link.get("href")
+                #        ).path
+                #    ))
+
+                #response = requests.get(urljoin(
+                #    request.url, link.get("href")
+                #    ))
+                
+            response = requests.get(urljoin(
+                request.url, link.get("href")
+                ))
+
             if not os.path.splitext(link.get('href'))[1]:
                 logger.debug(
                     'may occur error about ext of file'
@@ -177,11 +194,16 @@ def script_download(request, download_path):
                     #        ).path
                     #    )
 
+                    #response = requests.get(urljoin(
+                    #    request.url, urlparse(
+                    #        script.get("src")
+                    #        ).path
+                    #    ))
+
                     response = requests.get(urljoin(
-                        request.url, urlparse(
-                            script.get("src")
-                            ).path
+                        request.url, script.get("src")
                         ))
+
                 file_name = get_filename_from_tag(
                     request.url,
                     script.get('src')

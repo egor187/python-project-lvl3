@@ -48,7 +48,7 @@ def test_iscorrect_dir_name():
 
 def test_iscorrect_img_name():
     with tempfile.TemporaryDirectory() as tmpdir:
-        url = "https://page-loader.hexlet.repl.co/"
+        url = "https://page-loader.hexlet.repl.co"
         download(url, tmpdir)
         expect_dir_name = os.path.join(
             tmpdir,
