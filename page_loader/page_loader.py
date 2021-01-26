@@ -193,9 +193,9 @@ def script_download(request, download_path):
         for script in soup.find_all('script'):
             if script.get("src"):
 
-                if urlparse(script.get('src')).scheme:
-                    response = requests.get(script.get("src"))
-                elif not urlparse(script.get("src")).scheme:
+                # if urlparse(script.get('src')).scheme:
+                #    response = requests.get(script.get("src"))
+                # elif not urlparse(script.get("src")).scheme:
                     # response = requests.get(
                     #    request.url + urlparse(
                     #        script.get("src")
@@ -207,6 +207,10 @@ def script_download(request, download_path):
                     #        script.get("src")
                     #        ).path
                     #    ))
+                if not urlparse(script.get('src')).scheme \
+                    or urlparse(script.get('src')).scheme \
+                    and urlparse(script.get('src')).netloc \
+                        == urlparse(request.url).netloc:
 
                     response = requests.get(urljoin(
                         request.url, script.get("src")
