@@ -90,16 +90,18 @@ def img_download(request, download_path):
                     request.url, link.get('src')
                         ))
 
-                filename_from_img_link = os.path.join(
-                    download_path,
-                    get_filename_from_tag(
-                        request.url,
-                        link.get('src')
-                    )
-                )
+                #filename_from_img_link = os.path.join(
+                #    download_path,
+                #    get_filename_from_tag(
+                #        request.url,
+                #        link.get('src')
+                #    )
+                #)
+
+                filename_from_img_link = get_filename_from_tag(request.url, link.get('src'))
 
                 new_src_to_img_list.append(filename_from_img_link)
-                with open(filename_from_img_link, "wb") as r:
+                with open(os.path.join(download_path, filename_from_img_link), "wb") as r:
                     logger.debug(f'downloading image "{link}"')
                     logger.debug(
                         'may occur error if dir for download already exist'
@@ -164,19 +166,21 @@ def link_download(request, download_path):
                     link.get('href')
                 )
 
-            filename_from_link_link = os.path.join(
-                download_path,
-                file_name
-            )
-
+            #filename_from_link_link = os.path.join(
+            #    download_path,
+            #    file_name
+            #)
+            
             if not urlparse(link.get('href')).scheme \
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
                     == urlparse(request.url).netloc:
 
-                new_href_to_link_list.append(filename_from_link_link)
+                #new_href_to_link_list.append(filename_from_link_link)
+                
+                new_href_to_link_list.append(file_name)
 
-                with open(filename_from_link_link, "w") as r:
+                with open(os.path.join(download_path, file_name), "w") as r:
                     logger.debug(f'downloading link "{link}"')
                     r.write(response.text)
                     spinner.next()
@@ -221,19 +225,21 @@ def script_download(request, download_path):
                     script.get('src')
                 )
 
-                filename_from_script_link = os.path.join(
-                    download_path,
-                    file_name
-                )
+                #filename_from_script_link = os.path.join(
+                #    download_path,
+                #    file_name
+                #)
 
                 if not urlparse(script.get('src')).scheme \
                     or urlparse(script.get('src')).scheme \
                     and urlparse(script.get('src')).netloc \
                         == urlparse(request.url).netloc:
 
-                    new_src_to_script_list.append(filename_from_script_link)
+                    #new_src_to_script_list.append(filename_from_script_link)
+                    
+                    new_src_to_script_list.append(file_name)
 
-                    with open(filename_from_script_link, "w") as r:
+                    with open(os.path.join(download_path, file_name), "w") as r:
                         logger.debug(f'downloading script "{script}"')
                         r.write(response.text)
                         spinner.next()
@@ -256,6 +262,7 @@ def download(url, download_path):
     path = os.path.join(download_path, file_name)
     path_to_file = path + '.html'
     path_to_dir = path + '_files'
+    local_source_path = file_name + '_files'
     os.mkdir(path_to_dir)
 
     new_src_for_img = img_download(request, path_to_dir)
@@ -290,16 +297,16 @@ def download(url, download_path):
     with open(path_to_file, "w") as r:
         logger.info('Downloading html')
         for index, tag in enumerate(old_src_for_img):
-            tag['src'] = new_src_for_img[index]
+            tag['src'] = os.path.join(local_source_path, new_src_for_img[index])
             logger.debug('substitution source for img to downloaded')
 
         for index, tag in enumerate(old_href_for_link):
             logger.debug('substitution source for link to downloaded')
-            tag['href'] = new_href_for_link[index]
+            tag['href'] = os.path.join(local_source_path, new_href_for_link[index])
 
         for index, tag in enumerate(old_src_for_script):
             logger.debug('substitution source for script to downloaded')
-            tag['src'] = new_src_for_script[index]
+            tag['src'] = os.path.join(local_source_path, new_src_for_script[index])
 
         r.write(soup.prettify(formatter="html5"))
 
