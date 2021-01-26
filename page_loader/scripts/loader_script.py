@@ -34,6 +34,8 @@ def main():
 
     try:
         print(download(ie_source, output))
+        sys.exit(0)
+
     except ConnectionAbortedError as conn_exc:
         logger.exception(msg='exception about status_code')
         print(conn_exc)
@@ -65,6 +67,10 @@ def main():
         else:
             print(f"Some OS error occured. Error is: {os_error}.")
         raise SystemExit
+
+    except Exception as exc:
+        print('Global error')
+        sys.exit(1)
 
 
 if __name__ == "__main__":
