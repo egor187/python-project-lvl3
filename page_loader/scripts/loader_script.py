@@ -63,7 +63,7 @@ def main():
             )
         else:
             print(f"Some OS error occured. Error is: {os_error}.")
-    else:
+    finally:
         sys.exit(0)
 
 
