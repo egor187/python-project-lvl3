@@ -78,6 +78,7 @@ def download(url, output):
     links, data = change_links(content, dir_name)
     write_to_file(os.path.join(output, file_name), data)
     save_resources(links, os.path.join(output, dir_name), url)
+    return file_name
 
 
 #def get_filename_from_tag(url, source):
