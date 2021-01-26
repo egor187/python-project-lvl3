@@ -136,10 +136,14 @@ def link_download(request, download_path):
                 #response = requests.get(urljoin(
                 #    request.url, link.get("href")
                 #    ))
-                
-            response = requests.get(urljoin(
-                request.url, link.get("href")
-                ))
+            
+            if link.get('href').startswith('/'):
+                response = requests.get(request.url + link.get('href'))
+            else:
+                response = requests.get(urljoin(request.url, link.get('href')))
+            #response = requests.get(urljoin(
+            #    request.url, link.get("href")
+            #    ))
 
             if not os.path.splitext(link.get('href'))[1]:
                 logger.debug(
