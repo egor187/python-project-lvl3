@@ -302,6 +302,6 @@ def download(url, download_path):
             tag['src'] = new_src_for_script[index]
 
         #r.write(soup.prettify(formatter="html5"))
-        r.write(str(soup)
+        r.write(str(soup))
 
     return path_to_file
