@@ -38,15 +38,11 @@ def main():
     except TypeError as tr:
         print(tr)
         sys.exit(1)
-    else:
-        sys.exit(0)
 
     except ConnectionAbortedError as conn_exc:
         logger.exception(msg='exception about status_code')
         print(conn_exc)
         sys.exit(1)
-    else:
-        sys.exit(0)
 
     except requests.exceptions.ConnectionError as exc:
         print(
@@ -54,8 +50,6 @@ def main():
             f"Check out your connection"
         )
         sys.exit(1)
-    else:
-        sys.exit(0)
 
     except OSError as os_error:
         if os_error.errno == 2:
