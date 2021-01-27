@@ -185,13 +185,13 @@ def script_download(request, download_path):
 
 def download(url, download_path):
     if not os.path.exists(download_path):
-        raise OSError(f'Directory {download_path} is not exist')
+        raise FileNotFoundError(f'Directory {download_path} is not exist')
     if not os.access(download_path, os.W_OK):
-        raise OSError(f'Directory {download_path} is unable to write')
+        raise PermissionError(f'Directory {download_path} is unable to write')
     if not os.path.isdir(download_path):
-        raise OSError(f'Path to download {download_path} is not a directory')
-    if os.path.isfile(download_path):
-        raise FileExistsError(f'Directory {download_path} is already exist')
+        raise NotADirectoryError(f'Path to download {download_path} is not a directory')
+    #if os.path.isfile(download_path):
+    #    raise FileExistsError(f'Directory {download_path} is already exist')
     
 
     request = requests.get(url)
@@ -207,6 +207,10 @@ def download(url, download_path):
     path_to_file = path + '.html'
     path_to_dir = path + '_files'
     local_source_path = file_name + '_files'
+
+    if os.path.isdir(path_to_dir):
+        raise FileExistsError(f'Directory "{path_to_dir}" already exists')
+    
     os.mkdir(path_to_dir)
     
     new_src_for_img = img_download(request, path_to_dir)
