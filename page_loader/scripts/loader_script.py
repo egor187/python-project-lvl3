@@ -37,6 +37,7 @@ def main():
         sys.exit(0)
     except Exception as x:
         print(x)
+        SystemExit
 
     #try:
     #    download(ie_source, output)
