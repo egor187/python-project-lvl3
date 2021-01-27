@@ -60,9 +60,3 @@ def test_iscorrect_img_name():
             "page-loader-hexlet-repl-co-assets-professions-nodejs.png"
         )
         assert os.path.isfile(expect_img_file_name)
-
-def test_hexlet_check():
-    def main():
-        return 2 + 3
-
-    assert main() == 4

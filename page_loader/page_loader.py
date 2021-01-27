@@ -309,5 +309,5 @@ def download(url, download_path):
             tag['src'] = os.path.join(local_source_path, new_src_for_script[index])
 
         r.write(soup.prettify(formatter="html5"))
-
+    print(path_to_file)
     return path_to_file
