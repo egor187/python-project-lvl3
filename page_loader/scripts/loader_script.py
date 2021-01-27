@@ -35,24 +35,49 @@ def main():
     try:
         print(download(ie_source, output))
 
-    except TypeError as tr:
-        print(tr)
+    except FileNotFoundError as fnfe:
+        print(fnfe)
+        sys.exit(1)
 
-    except ConnectionAbortedError as conn_exc:
-        logger.exception(msg='exception about status_code')
-        print(conn_exc)
+    except PermissionError as pe:
+        print(pe)
+        sys.exit(1)
+
+    except NotADirectoryError as nade:
+        print(nade)
+        sys.exit(1)
 
     except requests.exceptions.ConnectionError as exc:
-        print(
-            f"Some serious problems with connection occur. Error is: {exc}. "
-            f"Check out your connection"
-        )
-    except OSError as e:
-        print(e)
+        print(f'Unable to connect to {ie_source}')
+        sys.exit(1)
 
-    #TODO catch errno17 (file exist)
-    except FileExistsError as fee:
-        print(fee)
+    except ConnectionAbortedError as cae:
+        print(cae)
+    
+    else:
+        sys.exit(0)
+
+
+
+
+#    except TypeError as tr:
+#        print(tr)
+#
+#    except ConnectionAbortedError as conn_exc:
+#        logger.exception(msg='exception about status_code')
+#        print(conn_exc)
+#
+#    except requests.exceptions.ConnectionError as exc:
+#        print(
+#            f"Some serious problems with connection occur. Error is: {exc}. "
+#            f"Check out your connection"
+#        )
+#    except OSError as e:
+#        print(e)
+#
+#    #TODO catch errno17 (file exist)
+#    except FileExistsError as fee:
+#        print(fee)
 
     #except OSError as os_error:
     #    if os_error.errno == 2:

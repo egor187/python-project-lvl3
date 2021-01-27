@@ -51,19 +51,19 @@ def get_filename_from_url(url):
     return file_name_from_url
 
 
-def get_content_type(url):
-    request = requests.get(url)
-    content_type = re.search(
-            r'/(\S+);',
-            request.headers['Content-Type']
-            ).group(1)
-    logger.debug('check content-type from server response')
-    return content_type
+#def get_content_type(url):
+#    request = requests.get(url)
+#    content_type = re.search(
+#            r'/(\S+);',
+#            request.headers['Content-Type']
+#            ).group(1)
+#    logger.debug('check content-type from server response')
+#    return content_type
 
 
-def get_content(url):
-    request = requests.get(url)
-    return request
+#def get_content(url):
+#    request = requests.get(url)
+#    return request
 
 
 def img_download(request, download_path):
@@ -188,19 +188,21 @@ def download(url, download_path):
         raise FileNotFoundError(f'Directory {download_path} is not exist')
     if not os.access(download_path, os.W_OK):
         raise PermissionError(f'Directory {download_path} is unable to write')
-    if not os.path.isdir(download_path):
-        raise NotADirectoryError(f'Path to download {download_path} is not a directory')
+    #if not os.path.isdir(download_path):
+    #    raise NotADirectoryError(f'Path to download {download_path} is not a directory')
     #if os.path.isfile(download_path):
     #    raise FileExistsError(f'Directory {download_path} is already exist')
     
 
     request = requests.get(url)
 
+# TODO check how works this handler
     if request.status_code != 200:
         raise ConnectionAbortedError(
             f"Status-code of server-response "
             f"from '{request.url}' is '{request.status_code}'"
         )
+
 
     file_name = get_filename_from_url(url)
     path = os.path.join(download_path, file_name)
