@@ -99,10 +99,6 @@ def img_download(request, download_path):
                 #)
 
                 filename_from_img_link = get_filename_from_tag(request.url, link.get('src'))
-                
-                if os.path.isfile(os.path.join(download_path, filename_from_img_link)):
-                    raise FileExistsError(f'File {filename_from_img_link} is already exist')
-    
 
                 new_src_to_img_list.append(filename_from_img_link)
                 with open(os.path.join(download_path, filename_from_img_link), "wb") as r:
@@ -175,9 +171,6 @@ def link_download(request, download_path):
             #    file_name
             #)
             
-            if os.path.isfile(os.path.join(download_path, file_name)):
-                raise FileExistsError(f'File {file_name} is already exist')
-    
             if not urlparse(link.get('href')).scheme \
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
@@ -237,9 +230,6 @@ def script_download(request, download_path):
                 #    file_name
                 #)
 
-                if os.path.isfile(os.path.join(download_path, file_name)):
-                    raise FileExistsError(f'File {file_name} is already exist')
-    
                 if not urlparse(script.get('src')).scheme \
                     or urlparse(script.get('src')).scheme \
                     and urlparse(script.get('src')).netloc \
@@ -259,15 +249,13 @@ def script_download(request, download_path):
 
 def download(url, download_path):
     if not os.path.exists(download_path):
-        raise FileNotFoundError(f'Directory {download_path} is not exist')
+        raise OSError(f'Directory {download_path} is not exist')
     if not os.access(download_path, os.W_OK):
-        raise PermissionError(f'Directory {download_path} is unable to write')
-    #if not os.path.isdir(download_path):
-    #    raise OSError(f'Path to download {download_path} is not a directory')
-    #if os.path.isdir(download_path):
-    #    raise FileExistsError(f'Directory {download_path} is already exists')
-    #if os.path.isfile(download_path):
-    #    raise FileExistsError(f'Directory {download_path} is already exist')
+        raise OSError(f'Directory {download_path} is unable to write')
+    if not os.path.isdir(download_path):
+        raise OSError(f'Path to download {download_path} is not a directory')
+    if os.path.isfile(download_path):
+        raise FileExistsError(f'Directory {download_path} is already exist')
     
 
     request = requests.get(url)
@@ -283,10 +271,6 @@ def download(url, download_path):
     path_to_file = path + '.html'
     path_to_dir = path + '_files'
     local_source_path = file_name + '_files'
-    
-    if os.path.isdir(path_to_dir):
-        raise FileExistsError(f'Directory {path_to_dir} already exists')
-
     os.mkdir(path_to_dir)
     
     new_src_for_img = img_download(request, path_to_dir)
@@ -317,9 +301,6 @@ def download(url, download_path):
         and urlparse(script.get("src")).netloc == urlparse(request.url).netloc
         or script.get("src") and not urlparse(script.get("src")).scheme
     ]
-
-    #if os.path.isfile(path_to_file):
-    #    raise FileExistsError(f'File {path_to_file} is already exists')
 
     with open(path_to_file, "w") as r:
         logger.info('Downloading html')

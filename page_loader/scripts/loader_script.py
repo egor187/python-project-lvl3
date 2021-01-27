@@ -47,15 +47,12 @@ def main():
             f"Some serious problems with connection occur. Error is: {exc}. "
             f"Check out your connection"
         )
-    #except OSError as e:
-    #    print(e)
+    except OSError as e:
+        print(e)
+
+    #TODO catch errno17 (file exist)
     except FileExistsError as fee:
         print(fee)
-    except FileNotFoundError as fnfe:
-        print(fnfe)
-    except PermissionError as pe:
-        print(pe)
-
 
     #except OSError as os_error:
     #    if os_error.errno == 2:
