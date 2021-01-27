@@ -33,19 +33,17 @@ def main():
     output = parser.parse_args().output
 
     try:
-        print(download(ie_source, output))
+        download(ie_source, output)
 
     except ConnectionAbortedError as conn_exc:
         logger.exception(msg='exception about status_code')
         print(conn_exc)
-        raise
 
     except requests.exceptions.ConnectionError as exc:
         print(
             f"Some serious problems with connection occur. Error is: {exc}. "
             f"Check out your connection"
         )
-        raise
 
     except OSError as os_error:
         if os_error.errno == 2:
@@ -63,7 +61,6 @@ def main():
                 f"Same file already exist. "
                 f"Try another file_name. Error is: {os_error}."
             )
-        raise
        # else:
        #     print(f"Some OS error occured. Error is: {os_error}.")
        # raise SystemExit

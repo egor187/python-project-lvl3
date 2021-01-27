@@ -256,5 +256,4 @@ def download(url, download_path):
             )
 
         r.write(soup.prettify(formatter="html5"))
-
-    return path_to_file
+    print(path_to_file)
