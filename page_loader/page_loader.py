@@ -257,6 +257,11 @@ def download(url, download_path):
     #        f"Status-code of server-response "
     #        f"from '{request.url}' is '{request.status_code}'"
     #    )
+    if request.status_code != 200:
+        raise Exception(
+            f"Status-code of server-response "
+            f"from '{request.url}' is '{request.status_code}'"
+        )
 
     file_name = get_filename_from_url(url)
     path = os.path.join(download_path, file_name)

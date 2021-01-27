@@ -32,7 +32,11 @@ def main():
     ie_source = parser.parse_args().web_source
     output = parser.parse_args().output
     
-    download(ie_source, output)
+    try:
+        download(ie_source, output)
+        sys.exit(0)
+    except Exception as x:
+        print(x)
 
     #try:
     #    download(ie_source, output)
