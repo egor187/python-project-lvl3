@@ -51,21 +51,6 @@ def get_filename_from_url(url):
     return file_name_from_url
 
 
-#def get_content_type(url):
-#    request = requests.get(url)
-#    content_type = re.search(
-#            r'/(\S+);',
-#            request.headers['Content-Type']
-#            ).group(1)
-#    logger.debug('check content-type from server response')
-#    return content_type
-
-
-#def get_content(url):
-#    request = requests.get(url)
-#    return request
-
-
 def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_img_list = []
