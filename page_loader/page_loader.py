@@ -252,11 +252,13 @@ def download(url, download_path):
 
     if not request:
         raise TypeError(f"Not valid url for '{request.url}'")
+        sys.exit(0)
     if request.status_code != 200:
         raise ConnectionAbortedError(
             f"Status-code of server-response "
             f"from '{request.url}' is '{request.status_code}'"
         )
+        sys.exit(0)
 
     file_name = get_filename_from_url(url)
     path = os.path.join(download_path, file_name)
