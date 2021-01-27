@@ -33,7 +33,7 @@ def main():
     output = parser.parse_args().output
 
     try:
-        download(ie_source, output)
+        res = download(ie_source, output)
 
     except ConnectionAbortedError as conn_exc:
         logger.exception(msg='exception about status_code')
@@ -64,6 +64,8 @@ def main():
        # else:
        #     print(f"Some OS error occured. Error is: {os_error}.")
        # raise SystemExit
+    else:
+        print(res)
 
 
 if __name__ == "__main__":
