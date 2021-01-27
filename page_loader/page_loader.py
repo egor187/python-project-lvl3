@@ -75,28 +75,10 @@ def img_download(request, download_path):
         for link in soup.find_all('img'):
             logger.debug('check for having "src" atribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
-                # response = requests.get(
-                #    request.url + urlparse(
-                #        link.get('src')
-                #        ).path
-                #    )
-                # response = requests.get(urljoin(
-                #    request.url, urlparse(
-                #        link.get('src')
-                #        ).path
-                #    ))
 
                 response = requests.get(urljoin(
                     request.url, link.get('src')
                         ))
-
-                #filename_from_img_link = os.path.join(
-                #    download_path,
-                #    get_filename_from_tag(
-                #        request.url,
-                #        link.get('src')
-                #    )
-                #)
 
                 filename_from_img_link = get_filename_from_tag(request.url, link.get('src'))
 
@@ -120,25 +102,6 @@ def link_download(request, download_path):
     while state != 'FINISHED':
         for link in soup.find_all('link'):
 
-            # if urlparse(link.get('href')).scheme\
-            #        and urlparse(link.get('href')).netloc:
-            #    response = requests.get(link.get("href"))
-            # elif not urlparse(link.get("href")).scheme:
-                # response = requests.get(
-                #    request.url + urlparse(
-                #        link.get("href")
-                #        ).path
-                #    )
-                # response = requests.get(urljoin(
-                #    request.url, urlparse(
-                #        link.get("href")
-                #        ).path
-                #    ))
-
-                # response = requests.get(urljoin(
-                #    request.url, link.get("href")
-                #    ))
-            
             if not urlparse(link.get('href')).scheme \
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
@@ -166,17 +129,11 @@ def link_download(request, download_path):
                     link.get('href')
                 )
 
-            #filename_from_link_link = os.path.join(
-            #    download_path,
-            #    file_name
-            #)
             
             if not urlparse(link.get('href')).scheme \
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
                     == urlparse(request.url).netloc:
-
-                #new_href_to_link_list.append(filename_from_link_link)
                 
                 new_href_to_link_list.append(file_name)
 
@@ -197,20 +154,6 @@ def script_download(request, download_path):
         for script in soup.find_all('script'):
             if script.get("src"):
 
-                # if urlparse(script.get('src')).scheme:
-                #    response = requests.get(script.get("src"))
-                # elif not urlparse(script.get("src")).scheme:
-                    # response = requests.get(
-                    #    request.url + urlparse(
-                    #        script.get("src")
-                    #        ).path
-                    #    )
-
-                    #response = requests.get(urljoin(
-                    #    request.url, urlparse(
-                    #        script.get("src")
-                    #        ).path
-                    #    ))
                 if not urlparse(script.get('src')).scheme \
                     or urlparse(script.get('src')).scheme \
                     and urlparse(script.get('src')).netloc \
@@ -225,17 +168,10 @@ def script_download(request, download_path):
                     script.get('src')
                 )
 
-                #filename_from_script_link = os.path.join(
-                #    download_path,
-                #    file_name
-                #)
-
                 if not urlparse(script.get('src')).scheme \
                     or urlparse(script.get('src')).scheme \
                     and urlparse(script.get('src')).netloc \
                         == urlparse(request.url).netloc:
-
-                    #new_src_to_script_list.append(filename_from_script_link)
                     
                     new_src_to_script_list.append(file_name)
 
