@@ -248,10 +248,13 @@ def script_download(request, download_path):
 
 
 def download(url, download_path):
+    if not os.path.exists(download_path):
+        raise OSError(f'Directory {download_path} is not exist')
+    if not os.access(download_path, os.W_OK):
+        raise OSError(f'Directory {download_path} is unable to write')
+
     request = requests.get(url)
 
-    #if not request:
-    #    raise TypeError(f"Not valid url for '{request.url}'")
     if request.status_code != 200:
         raise ConnectionAbortedError(
             f"Status-code of server-response "
@@ -264,6 +267,9 @@ def download(url, download_path):
     path_to_dir = path + '_files'
     local_source_path = file_name + '_files'
     os.mkdir(path_to_dir)
+    
+    if os.listdir(path_to_dir):
+        raise OSError(f'Directory {path_to_dir} is not empty')
 
     new_src_for_img = img_download(request, path_to_dir)
     logger.info('\nimages downloaded')
@@ -308,6 +314,8 @@ def download(url, download_path):
             logger.debug('substitution source for script to downloaded')
             tag['src'] = os.path.join(local_source_path, new_src_for_script[index])
 
+
         r.write(soup.prettify(formatter="html5"))
+
     print(path_to_file)
     return path_to_file

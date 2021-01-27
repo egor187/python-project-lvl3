@@ -47,28 +47,31 @@ def main():
             f"Some serious problems with connection occur. Error is: {exc}. "
             f"Check out your connection"
         )
+    except OSError as e:
+        print(e)
 
-    except OSError as os_error:
-        if os_error.errno == 2:
-            print(
-                f"There is no such file or directory. "
-                f"Error is: {os_error}"
-            )
-        elif os_error.errno == 20:
-            print(
-                f"Path to download isn't correct. "
-                f"It's not a directory. Error is: {os_error}."
-            )
-        elif os_error.errno == 17:
-            print(
-                f"Same file already exist. "
-                f"Try another file_name. Error is: {os_error}."
-            )
+    #except OSError as os_error:
+    #    if os_error.errno == 2:
+    #        print(
+    #            f"There is no such file or directory. "
+    #            f"Error is: {os_error}"
+    #        )
+    #    elif os_error.errno == 20:
+    #        print(
+    #            f"Path to download isn't correct. "
+    #            f"It's not a directory. Error is: {os_error}."
+    #        )
+    #    elif os_error.errno == 17:
+    #        print(
+    #            f"Same file already exist. "
+    #            f"Try another file_name. Error is: {os_error}."
+    #        )
 
-    except Exception as x:
-        print(f'Some serious problem occur wtih name: {x}')
+    #except Exception as x:
+    #    print(f'Some serious problem occur with name: {x}')
 
-    sys.exit(0)
+    #else:
+    #    sys.exit(0)
 
 if __name__ == "__main__":
     main()
