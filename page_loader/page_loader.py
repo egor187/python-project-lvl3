@@ -252,13 +252,8 @@ def download(url, download_path):
 
     #if not request:
     #    raise TypeError(f"Not valid url for '{request.url}'")
-    #if request.status_code != 200:
-    #    raise ConnectionAbortedError(
-    #        f"Status-code of server-response "
-    #        f"from '{request.url}' is '{request.status_code}'"
-    #    )
     if request.status_code != 200:
-        raise Exception(
+        raise ConnectionAbortedError(
             f"Status-code of server-response "
             f"from '{request.url}' is '{request.status_code}'"
         )
