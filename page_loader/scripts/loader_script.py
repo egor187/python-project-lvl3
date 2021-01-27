@@ -65,5 +65,10 @@ def main():
                 f"Try another file_name. Error is: {os_error}."
             )
 
+    except Exception as x:
+        print(f'Some serious problem occur wtih name: {x}')
+
+    sys.exit(0)
+
 if __name__ == "__main__":
     main()
