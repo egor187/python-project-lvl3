@@ -34,10 +34,10 @@ def main():
     
     try:
         download(ie_source, output)
-        sys.exit(0)
+        exit(0)
     except Exception as x:
         print(x)
-        SystemExit
+        exit(0)
 
     #try:
     #    download(ie_source, output)
