@@ -53,28 +53,16 @@ def main():
 
     except ConnectionAbortedError as cae:
         print(cae)
+        sys.exit(1)
+
+    except FileExistsError as fee:
+        print(fee)
+        sys.exit(1)
     
     else:
         sys.exit(0)
 
 
-
-
-#    except TypeError as tr:
-#        print(tr)
-#
-#    except ConnectionAbortedError as conn_exc:
-#        logger.exception(msg='exception about status_code')
-#        print(conn_exc)
-#
-#    except requests.exceptions.ConnectionError as exc:
-#        print(
-#            f"Some serious problems with connection occur. Error is: {exc}. "
-#            f"Check out your connection"
-#        )
-#    except OSError as e:
-#        print(e)
-#
 #    #TODO catch errno17 (file exist)
 #    except FileExistsError as fee:
 #        print(fee)
@@ -98,9 +86,6 @@ def main():
 
     #except Exception as x:
     #    print(f'Some serious problem occur with name: {x}')
-
-    #else:
-    #    sys.exit(0)
 
 if __name__ == "__main__":
     main()

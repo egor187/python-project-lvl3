@@ -83,6 +83,10 @@ def img_download(request, download_path):
                 filename_from_img_link = get_filename_from_tag(request.url, link.get('src'))
 
                 new_src_to_img_list.append(filename_from_img_link)
+
+                if os.path.isfile(os.path.join(download_path, filename_from_img_link)):
+                    raise FileExistsError(f'File {filename_from_img_link} already exists')
+
                 with open(os.path.join(download_path, filename_from_img_link), "wb") as r:
                     logger.debug(f'downloading image "{link}"')
                     logger.debug(
@@ -137,6 +141,9 @@ def link_download(request, download_path):
                 
                 new_href_to_link_list.append(file_name)
 
+                if os.path.isfile(os.path.join(download_path, file_name)):
+                    raise FileExistsError(f'File {file_name} already exists')
+
                 with open(os.path.join(download_path, file_name), "wb") as r:
                     logger.debug(f'downloading link "{link}"')
                     r.write(response.content)
@@ -175,6 +182,9 @@ def script_download(request, download_path):
                     
                     new_src_to_script_list.append(file_name)
 
+                    if os.path.isfile(os.path.join(download_path, file_name)):
+                        raise FileExistsError(f'File {filename_form_img_link} already exists')
+
                     with open(os.path.join(download_path, file_name), "w") as r:
                         logger.debug(f'downloading script "{script}"')
                         r.write(response.text)
@@ -188,15 +198,11 @@ def download(url, download_path):
         raise FileNotFoundError(f'Directory {download_path} is not exist')
     if not os.access(download_path, os.W_OK):
         raise PermissionError(f'Directory {download_path} is unable to write')
-    #if not os.path.isdir(download_path):
-    #    raise NotADirectoryError(f'Path to download {download_path} is not a directory')
-    #if os.path.isfile(download_path):
-    #    raise FileExistsError(f'Directory {download_path} is already exist')
-    
+    if not os.path.isdir(download_path):
+        raise NotADirectoryError(f'Path to download {download_path} is not a directory')
 
     request = requests.get(url)
 
-# TODO check how works this handler
     if request.status_code != 200:
         raise ConnectionAbortedError(
             f"Status-code of server-response "
@@ -211,7 +217,7 @@ def download(url, download_path):
     local_source_path = file_name + '_files'
 
     if os.path.isdir(path_to_dir):
-        raise FileExistsError(f'Directory "{path_to_dir}" already exists')
+        raise FileExistsError(f'Directory "{path_to_dir}" is not empty')
     
     os.mkdir(path_to_dir)
     
