@@ -33,7 +33,7 @@ def main():
     output = parser.parse_args().output
     
     try:
-        download(ie_source, output)
+        print(download(ie_source, output))
 
     except TypeError as tr:
         print(tr)
@@ -49,6 +49,10 @@ def main():
         )
     except OSError as e:
         print(e)
+
+    #TODO catch errno17 (file exist)
+    except FileExistsError as fee:
+        print(fee)
 
     #except OSError as os_error:
     #    if os_error.errno == 2:

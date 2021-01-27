@@ -42,10 +42,10 @@ def get_filename_from_tag(url, source):
 def get_filename_from_url(url):
     logger.debug('getting URL for download html')
     url_without_schema = re.search(r'^(https?://)(\S+)', url).group(2)
-    # last_slash_cutted_url = url_without_schema[:-1] \
-    #    if url_without_schema[-1] == "/"\
-    #    else url_without_schema
-    last_slash_cutted_url = url_without_schema
+    last_slash_cutted_url = url_without_schema[:-1] \
+        if url_without_schema[-1] == "/"\
+        else url_without_schema
+    #last_slash_cutted_url = url_without_schema
     file_name_from_url = re.sub(r'[\W+?]', '-', last_slash_cutted_url)
     logger.debug('creating filename for downloaded html')
     return file_name_from_url
@@ -252,6 +252,11 @@ def download(url, download_path):
         raise OSError(f'Directory {download_path} is not exist')
     if not os.access(download_path, os.W_OK):
         raise OSError(f'Directory {download_path} is unable to write')
+    if not os.path.isdir(download_path):
+        raise OSError(f'Path to download {download_path} is not a directory')
+    if os.path.isfile(download_path):
+        raise FileExistsError(f'Directory {download_path} is already exist')
+    
 
     request = requests.get(url)
 
@@ -268,9 +273,6 @@ def download(url, download_path):
     local_source_path = file_name + '_files'
     os.mkdir(path_to_dir)
     
-    if os.listdir(path_to_dir):
-        raise OSError(f'Directory {path_to_dir} is not empty')
-
     new_src_for_img = img_download(request, path_to_dir)
     logger.info('\nimages downloaded')
     new_href_for_link = link_download(request, path_to_dir)
@@ -314,8 +316,7 @@ def download(url, download_path):
             logger.debug('substitution source for script to downloaded')
             tag['src'] = os.path.join(local_source_path, new_src_for_script[index])
 
-
         r.write(soup.prettify(formatter="html5"))
+        
 
-    print(path_to_file)
     return path_to_file
