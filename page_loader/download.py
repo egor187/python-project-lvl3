@@ -8,7 +8,7 @@ from page_loader.naming import get_filename_from_tag, get_filename_for_link
 from page_loader.logging import logger
 
 
-def img_download(request, download_path):
+def img_download(request, download_path, local_source_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     old_src_to_img_list = []
     new_src_to_img_list = []
@@ -18,6 +18,7 @@ def img_download(request, download_path):
         for link in soup.find_all('img'):
             logger.debug('check for having "src" atribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
+                old_src_to_img_list.append(link)
                 response = requests.get(
                     urljoin(
                         request.url,
@@ -28,7 +29,6 @@ def img_download(request, download_path):
                     request.url,
                     link.get('src')
                 )
-                old_src_to_img_list.append(link)
                 new_src_to_img_list.append(filename_from_img_link)
                 if os.path.isfile(
                     os.path.join(
@@ -54,7 +54,13 @@ def img_download(request, download_path):
                     r.write(response.content)
                     spinner.next()
         state = "FINISHED"
-    return old_src_to_img_list, new_src_to_img_list
+        for index, tag in enumerate(old_src_to_img_list):
+            tag['src'] = os.path.join(
+                local_source_path,
+                new_src_to_img_list[index]
+            )
+
+    return new_src_to_img_list
 
 
 def link_download(request, download_path):
