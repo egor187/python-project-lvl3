@@ -35,29 +35,29 @@ def main():
     try:
         print(download(ie_source, output))
 
-    except FileNotFoundError as fnfe:
-        print(fnfe)
-        sys.exit(1)
+   # except FileNotFoundError as fnfe:
+   #     print(fnfe)
+   #     sys.exit(1)
 
-    except PermissionError as pe:
-        print(pe)
-        sys.exit(1)
+   # except PermissionError as pe:
+   #     print(pe)
+   #     sys.exit(1)
 
-    except NotADirectoryError as nade:
-        print(nade)
-        sys.exit(1)
+   # except NotADirectoryError as nade:
+   #     print(nade)
+   #     sys.exit(1)
 
-    except requests.exceptions.ConnectionError:
-        print(f'Unable to connect to {ie_source}')
-        sys.exit(1)
+   # except requests.exceptions.ConnectionError:
+   #     print(f'Unable to connect to {ie_source}')
+   #     sys.exit(1)
 
-    except ConnectionAbortedError as cae:
-        print(cae)
-        sys.exit(1)
+   # except ConnectionAbortedError as cae:
+   #     print(cae)
+   #     sys.exit(1)
 
-    except FileExistsError as fee:
-        print(fee)
-        sys.exit(1)
+   # except FileExistsError as fee:
+   #     print(fee)
+   #     sys.exit(1)
 
     except Exception as e:
         print(e)
