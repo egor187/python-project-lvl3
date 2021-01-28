@@ -5,6 +5,7 @@ import os
 import sys
 import os.path
 import logging
+import requests
 from page_loader import download
 
 logger = logging.getLogger()
@@ -58,8 +59,10 @@ def main():
         print(fee)
         sys.exit(1)
 
-    except requests.HTTPError as req:
-        print(req)
+    except requests.HTTPError:
+        print(
+            'Some connection error is occur while recieve a response from url'
+        )
 
     except Exception as e:
         print(e)
