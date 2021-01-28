@@ -4,7 +4,6 @@ import argparse
 import os
 import sys
 import os.path
-import requests
 import logging
 from page_loader import download
 

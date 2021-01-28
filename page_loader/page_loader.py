@@ -68,6 +68,13 @@ def get_filename_for_link(link, request):
     return file_name
 
 
+# def get_filename_for_script(script, request):
+#    if script.get('src'):
+#        file_name = get_filename_from_tag(request.url, script.get('src'))
+#    return file_name
+
+
+
 def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_img_list = []
@@ -198,6 +205,11 @@ def script_download(request, download_path):
         for script in soup.find_all('script'):
             if script.get("src"):
 
+                file_name = get_filename_from_tag(
+                    request.url,
+                    script.get('src')
+                 )
+
                 if not urlparse(script.get('src')).scheme \
                     or urlparse(script.get('src')).scheme \
                     and urlparse(script.get('src')).netloc \
@@ -209,16 +221,6 @@ def script_download(request, download_path):
                             script.get("src")
                         )
                     )
-
-                file_name = get_filename_from_tag(
-                    request.url,
-                    script.get('src')
-                )
-
-                if not urlparse(script.get('src')).scheme \
-                    or urlparse(script.get('src')).scheme \
-                    and urlparse(script.get('src')).netloc \
-                        == urlparse(request.url).netloc:
 
                     new_src_to_script_list.append(file_name)
 
@@ -237,6 +239,7 @@ def script_download(request, download_path):
                         logger.debug(f'downloading script "{script}"')
                         r.write(response.text)
                         spinner.next()
+
         state = "FINISHED"
     return new_src_to_script_list
 
@@ -296,11 +299,11 @@ def download(url, download_path):
         script for script in soup.find_all("script")
         if script.get("src") and urlparse(
             script.get("src")
-            ).netloc == urlparse(
+        ).netloc == urlparse(
                 request.url
-            ).netloc or script.get("src") and not urlparse(
+        ).netloc or script.get("src") and not urlparse(
                 script.get("src")
-            ).scheme
+        ).scheme
     ]
 
     with open(path_to_file, "w") as r:
