@@ -21,11 +21,11 @@ def download(url, download_path):
 
     os.mkdir(path_to_dir)
 
-    new_src_for_img = img_download(request, path_to_dir)[1]
-    logger.info('\nimages downloaded')
+#    new_src_for_img = img_download(request, path_to_dir)[1]
+#    logger.info('\nimages downloaded')
 
-#    new_href_for_link = link_download(request, path_to_dir)
-#    logger.info('\nlinks downloaded')
+    new_href_for_link = link_download(request, path_to_dir)
+    logger.info('\nlinks downloaded')
 
     new_src_for_script = script_download(request, path_to_dir)
     logger.info('\nscripts downloaded')
