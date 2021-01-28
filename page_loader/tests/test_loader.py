@@ -4,7 +4,8 @@ import tempfile
 import requests
 import requests_mock
 import pytest
-from page_loader import download, link_download
+from page_loader import download
+from page_loader.download import link_download
 
 
 def test_file_html_create():
