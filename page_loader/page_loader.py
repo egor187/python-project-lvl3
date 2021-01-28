@@ -294,7 +294,7 @@ def download(url, download_path):
     new_src_for_img = img_download(request, path_to_dir)[1]
     logger.info('\nimages downloaded')
 
-    #old_href_for_link, new_href_for_link = link_download(request, path_to_dir)
+    # old_href_for_link, new_href_for_link = link_download(request, path_to_dir)
     new_href_for_link = link_download(request, path_to_dir)[1]
     logger.info('\nlinks downloaded')
 
@@ -321,9 +321,9 @@ def download(url, download_path):
         if script.get("src") and urlparse(
             script.get("src")
         ).netloc == urlparse(
-                request.url
+            request.url
         ).netloc or script.get("src") and not urlparse(
-                script.get("src")
+            script.get("src")
         ).scheme
     ]
 
