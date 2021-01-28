@@ -290,10 +290,12 @@ def download(url, download_path):
 
     os.mkdir(path_to_dir)
 
-    old_src_for_img, new_src_for_img = img_download(request, path_to_dir)
+    # old_src_for_img, new_src_for_img = img_download(request, path_to_dir)
+    new_src_for_img = img_download(request, path_to_dir)[1]
     logger.info('\nimages downloaded')
 
-    old_href_for_link, new_href_for_link = link_download(request, path_to_dir)
+    #old_href_for_link, new_href_for_link = link_download(request, path_to_dir)
+    new_href_for_link = link_download(request, path_to_dir)[1]
     logger.info('\nlinks downloaded')
 
     new_src_for_script = script_download(request, path_to_dir)
