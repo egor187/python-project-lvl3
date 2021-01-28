@@ -5,46 +5,8 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
 from progress.spinner import Spinner
-import logging
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-debug_handler = logging.FileHandler(filename='./logging_debug.log', mode='w')
-debug_handler.setLevel(logging.DEBUG)
-
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-
-debug_formatter = logging.Formatter(
-    '%(asctime)s -%(name)s - %(levelname)s - %(message)s'
-)
-stream_formatter = logging.Formatter('%(message)s')
-
-debug_handler.setFormatter(debug_formatter)
-stream_handler.setFormatter(stream_formatter)
-
-logger.addHandler(debug_handler)
-logger.addHandler(stream_handler)
-
-
-def exc(request, download_path, path_to_dir):
-    if not os.path.exists(download_path):
-        raise FileNotFoundError(f'Directory {download_path} is not exist')
-    if not os.access(download_path, os.W_OK):
-        raise PermissionError(f'Directory {download_path} is unable to write')
-    if not os.path.isdir(download_path):
-        raise NotADirectoryError(
-            f'Path to download {download_path} is not a directory'
-        )
-    if request.status_code != 200:
-        raise ConnectionAbortedError(
-            f"Status-code of server-response "
-            f"from '{request.url}' is '{request.status_code}'"
-        )
-    if os.path.isdir(path_to_dir):
-        raise FileExistsError(f'Directory "{path_to_dir}" is not empty')
+from page_loader.logging import logger
+from page_loader.exceptions import exc
 
 
 def get_filename_from_tag(url, source):
