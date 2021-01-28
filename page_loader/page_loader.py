@@ -29,6 +29,17 @@ logger.addHandler(debug_handler)
 logger.addHandler(stream_handler)
 
 
+def exc(download_path):
+    if not os.path.exists(download_path):
+        raise FileNotFoundError(f'Directory {download_path} is not exist')
+    if not os.access(download_path, os.W_OK):
+        raise PermissionError(f'Directory {download_path} is unable to write')
+    if not os.path.isdir(download_path):
+        raise NotADirectoryError(
+            f'Path to download {download_path} is not a directory'
+        )
+
+
 def get_filename_from_tag(url, source):
     url_parsed = urlparse(url)
     logger.debug('parsing url')
@@ -66,13 +77,6 @@ def get_filename_for_link(link, request):
             link.get('href')
         )
     return file_name
-
-
-# def get_filename_for_script(script, request):
-#    if script.get('src'):
-#        file_name = get_filename_from_tag(request.url, script.get('src'))
-#    return file_name
-
 
 
 def img_download(request, download_path):
@@ -208,7 +212,7 @@ def script_download(request, download_path):
                 file_name = get_filename_from_tag(
                     request.url,
                     script.get('src')
-                 )
+                )
 
                 if not urlparse(script.get('src')).scheme \
                     or urlparse(script.get('src')).scheme \
@@ -245,14 +249,16 @@ def script_download(request, download_path):
 
 
 def download(url, download_path):
-    if not os.path.exists(download_path):
-        raise FileNotFoundError(f'Directory {download_path} is not exist')
-    if not os.access(download_path, os.W_OK):
-        raise PermissionError(f'Directory {download_path} is unable to write')
-    if not os.path.isdir(download_path):
-        raise NotADirectoryError(
-            f'Path to download {download_path} is not a directory'
-        )
+    #if not os.path.exists(download_path):
+    #    raise FileNotFoundError(f'Directory {download_path} is not exist')
+    #if not os.access(download_path, os.W_OK):
+    #    raise PermissionError(f'Directory {download_path} is unable to write')
+    #if not os.path.isdir(download_path):
+    #    raise NotADirectoryError(
+    #        f'Path to download {download_path} is not a directory'
+    #    )
+
+    exc(download_path)
 
     request = requests.get(url)
 
