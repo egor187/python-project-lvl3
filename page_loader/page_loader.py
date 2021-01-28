@@ -290,12 +290,12 @@ def download(url, download_path):
 
     os.mkdir(path_to_dir)
 
-    # old_src_for_img, new_src_for_img = img_download(request, path_to_dir)
-    new_src_for_img = img_download(request, path_to_dir)[1]
+    old_src_for_img, new_src_for_img = img_download(request, path_to_dir)
+    # new_src_for_img = img_download(request, path_to_dir)[1]
     logger.info('\nimages downloaded')
 
-    # old_href_for_link, new_href_for_link = link_download(request, path_to_dir)
-    new_href_for_link = link_download(request, path_to_dir)[1]
+    old_href_for_link, new_href_for_link = link_download(request, path_to_dir)
+    # new_href_for_link = link_download(request, path_to_dir)[1]
     logger.info('\nlinks downloaded')
 
     new_src_for_script = script_download(request, path_to_dir)
@@ -303,18 +303,18 @@ def download(url, download_path):
 
     soup = BeautifulSoup(request.text, "html.parser")
 
-    old_src_for_img = []
-    for tag in soup.find_all("img"):
-        if tag.get("src") and not urlparse(tag.get('src')).scheme:
-            old_src_for_img.append(tag)
+    # old_src_for_img = []
+    # for tag in soup.find_all("img"):
+    #     if tag.get("src") and not urlparse(tag.get('src')).scheme:
+    #         old_src_for_img.append(tag)
 
-    old_href_for_link = []
-    for tag in soup.find_all('link'):
-        if not urlparse(tag.get('href')).scheme \
-            or urlparse(tag.get('href')).scheme \
-            and urlparse(tag.get('href')).netloc \
-                == urlparse(request.url).netloc:
-            old_href_for_link.append(tag)
+    # old_href_for_link = []
+    # for tag in soup.find_all('link'):
+    #     if not urlparse(tag.get('href')).scheme \
+    #         or urlparse(tag.get('href')).scheme \
+    #         and urlparse(tag.get('href')).netloc \
+    #             == urlparse(request.url).netloc:
+    #         old_href_for_link.append(tag)
 
     old_src_for_script = [
         script for script in soup.find_all("script")
