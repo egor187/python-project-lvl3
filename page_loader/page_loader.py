@@ -60,9 +60,12 @@ def img_download(request, download_path):
             logger.debug('check for having "src" atribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
 
-                response = requests.get(urljoin(
-                    request.url, link.get('src')
-                        ))
+                response = requests.get(
+                    urljoin(
+                    request.url,
+                    link.get('src')
+                    )
+                )
 
                 filename_from_img_link = get_filename_from_tag(
                     request.url,
@@ -165,9 +168,12 @@ def script_download(request, download_path):
                     and urlparse(script.get('src')).netloc \
                         == urlparse(request.url).netloc:
 
-                    response = requests.get(urljoin(
-                        request.url, script.get("src")
-                        ))
+                    response = requests.get(
+                        urljoin(
+                            request.url,
+                            script.get("src")
+                        )
+                    )
 
                 file_name = get_filename_from_tag(
                     request.url,
@@ -177,7 +183,7 @@ def script_download(request, download_path):
                 if not urlparse(script.get('src')).scheme \
                     or urlparse(script.get('src')).scheme \
                     and urlparse(script.get('src')).netloc \
-                        == urlparse(request.url).netloc:
+                    == urlparse(request.url).netloc:
 
                     new_src_to_script_list.append(file_name)
 
