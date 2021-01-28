@@ -23,6 +23,7 @@ def img_download(request, download_path):
                         link.get('src')
                     )
                 )
+                response.raise_for_status(f'Connection error from "{request.url}"')
                 filename_from_img_link = get_filename_from_tag(
                     request.url,
                     link.get('src')
@@ -74,6 +75,7 @@ def link_download(request, download_path):
                         link.get("href")
                     )
                 )
+                response.raise_for_status(f'Connection error from "{request.url}"')
                 new_href_to_link_list.append(file_name)
                 if os.path.isfile(os.path.join(download_path, file_name)):
                     raise FileExistsError(f'File {file_name} already exists')
@@ -108,9 +110,9 @@ def script_download(request, download_path):
                         urljoin(
                             request.url,
                             script.get("src")
-                        )
+                            )
                     )
-
+                    response.raise_for_status(f'Connection error from "{request.url}"')
                     new_src_to_script_list.append(file_name)
 
                     if os.path.isfile(os.path.join(download_path, file_name)):
