@@ -21,7 +21,7 @@ def download(url, download_path):
 
     os.mkdir(path_to_dir)
 
-    old_src_for_img, new_src_for_img = img_download(request, path_to_dir)
+    new_src_for_img = img_download(request, path_to_dir)
     logger.info('\nimages downloaded')
 
     new_href_for_link = link_download(request, path_to_dir)
@@ -32,10 +32,10 @@ def download(url, download_path):
 
     soup = BeautifulSoup(request.text, "html.parser")
 
-#    old_src_for_img = []
-#    for tag in soup.find_all("img"):
-#        if tag.get("src") and not urlparse(tag.get('src')).scheme:
-#            old_src_for_img.append(tag)
+    old_src_for_img = []
+    for tag in soup.find_all("img"):
+        if tag.get("src") and not urlparse(tag.get('src')).scheme:
+            old_src_for_img.append(tag)
 
     old_href_for_link = []
     for tag in soup.find_all('link'):

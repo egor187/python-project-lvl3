@@ -10,16 +10,9 @@ from page_loader.logging import logger
 
 def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
-    old_src_to_img_list = []
     new_src_to_img_list = []
     spinner = Spinner('Loading images')
     state = 'go'
-    
-
-    for link in soup.find_all('img'):
-        if link.get('src') and not urlparse(link.get('src')).scheme:
-            old_src_to_img_list.append(link)
-
     while state != 'FINISHED':
         for link in soup.find_all('img'):
             logger.debug('check for having "src" atribute in tag <img>')
@@ -59,7 +52,7 @@ def img_download(request, download_path):
                     r.write(response.content)
                     spinner.next()
         state = "FINISHED"
-    return old_src_to_img_list, new_src_to_img_list
+    return new_src_to_img_list
 
 
 def link_download(request, download_path):
