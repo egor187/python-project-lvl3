@@ -29,7 +29,7 @@ logger.addHandler(debug_handler)
 logger.addHandler(stream_handler)
 
 
-def exc(download_path):
+def exc(request, download_path, path_to_dir):
     if not os.path.exists(download_path):
         raise FileNotFoundError(f'Directory {download_path} is not exist')
     if not os.access(download_path, os.W_OK):
@@ -38,6 +38,13 @@ def exc(download_path):
         raise NotADirectoryError(
             f'Path to download {download_path} is not a directory'
         )
+    if request.status_code != 200:
+        raise ConnectionAbortedError(
+            f"Status-code of server-response "
+            f"from '{request.url}' is '{request.status_code}'"
+        )
+    if os.path.isdir(path_to_dir):
+        raise FileExistsError(f'Directory "{path_to_dir}" is not empty')
 
 
 def get_filename_from_tag(url, source):
@@ -81,6 +88,7 @@ def get_filename_for_link(link, request):
 
 def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
+    old_src_to_img_list = []
     new_src_to_img_list = []
     spinner = Spinner('Loading images')
     state = 'go'
@@ -88,6 +96,7 @@ def img_download(request, download_path):
         for link in soup.find_all('img'):
             logger.debug('check for having "src" atribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
+                old_src_to_img_list.append(link)
 
                 response = requests.get(
                     urljoin(
@@ -127,11 +136,12 @@ def img_download(request, download_path):
                     r.write(response.content)
                     spinner.next()
         state = "FINISHED"
-    return new_src_to_img_list
+    return old_src_to_img_list, new_src_to_img_list
 
 
 def link_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
+    old_href_to_link_list = []
     new_href_to_link_list = []
     spinner = Spinner('Loading links')
     state = 'go'
@@ -159,6 +169,8 @@ def link_download(request, download_path):
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
                     == urlparse(request.url).netloc:
+
+                old_href_to_link_list.append(link)
 
                 response = requests.get(
                     urljoin(
@@ -197,7 +209,7 @@ def link_download(request, download_path):
                     r.write(response.content)
                     spinner.next()
         state = "FINISHED"
-    return new_href_to_link_list
+    return old_href_to_link_list, new_href_to_link_list
 
 
 def script_download(request, download_path):
@@ -249,24 +261,21 @@ def script_download(request, download_path):
 
 
 def download(url, download_path):
-    #if not os.path.exists(download_path):
+    # if not os.path.exists(download_path):
     #    raise FileNotFoundError(f'Directory {download_path} is not exist')
-    #if not os.access(download_path, os.W_OK):
+    # if not os.access(download_path, os.W_OK):
     #    raise PermissionError(f'Directory {download_path} is unable to write')
-    #if not os.path.isdir(download_path):
+    # if not os.path.isdir(download_path):
     #    raise NotADirectoryError(
     #        f'Path to download {download_path} is not a directory'
     #    )
-
-    exc(download_path)
-
     request = requests.get(url)
 
-    if request.status_code != 200:
-        raise ConnectionAbortedError(
-            f"Status-code of server-response "
-            f"from '{request.url}' is '{request.status_code}'"
-        )
+    # if request.status_code != 200:
+    #    raise ConnectionAbortedError(
+    #        f"Status-code of server-response "
+    #        f"from '{request.url}' is '{request.status_code}'"
+    #    )
 
     file_name = get_filename_from_url(url)
     path = os.path.join(download_path, file_name)
@@ -274,32 +283,36 @@ def download(url, download_path):
     path_to_dir = path + '_files'
     local_source_path = file_name + '_files'
 
-    if os.path.isdir(path_to_dir):
-        raise FileExistsError(f'Directory "{path_to_dir}" is not empty')
+    exc(request, download_path, path_to_dir)
+
+    # if os.path.isdir(path_to_dir):
+    #    raise FileExistsError(f'Directory "{path_to_dir}" is not empty')
 
     os.mkdir(path_to_dir)
 
-    new_src_for_img = img_download(request, path_to_dir)
+    old_src_for_img, new_src_for_img = img_download(request, path_to_dir)
     logger.info('\nimages downloaded')
-    new_href_for_link = link_download(request, path_to_dir)
+
+    old_href_for_link, new_href_for_link = link_download(request, path_to_dir)
     logger.info('\nlinks downloaded')
+
     new_src_for_script = script_download(request, path_to_dir)
     logger.info('\nscripts downloaded')
 
     soup = BeautifulSoup(request.text, "html.parser")
 
-    old_src_for_img = []
-    for tag in soup.find_all("img"):
-        if tag.get("src") and not urlparse(tag.get('src')).scheme:
-            old_src_for_img.append(tag)
+    # old_src_for_img = []
+    # for tag in soup.find_all("img"):
+    #    if tag.get("src") and not urlparse(tag.get('src')).scheme:
+    #        old_src_for_img.append(tag)
 
-    old_href_for_link = []
-    for tag in soup.find_all('link'):
-        if not urlparse(tag.get('href')).scheme \
-            or urlparse(tag.get('href')).scheme \
-            and urlparse(tag.get('href')).netloc \
-                == urlparse(request.url).netloc:
-            old_href_for_link.append(tag)
+    # old_href_for_link = []
+    # for tag in soup.find_all('link'):
+    #    if not urlparse(tag.get('href')).scheme \
+    #        or urlparse(tag.get('href')).scheme \
+    #        and urlparse(tag.get('href')).netloc \
+    #            == urlparse(request.url).netloc:
+    #        old_href_for_link.append(tag)
 
     old_src_for_script = [
         script for script in soup.find_all("script")
