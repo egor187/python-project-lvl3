@@ -303,13 +303,13 @@ def download(url, download_path):
 
     soup = BeautifulSoup(request.text, "html.parser")
 
-     old_src_for_img = []
-     for tag in soup.find_all("img"):
+    old_src_for_img = []
+    for tag in soup.find_all("img"):
         if tag.get("src") and not urlparse(tag.get('src')).scheme:
             old_src_for_img.append(tag)
 
-     old_href_for_link = []
-     for tag in soup.find_all('link'):
+    old_href_for_link = []
+    for tag in soup.find_all('link'):
         if not urlparse(tag.get('href')).scheme \
             or urlparse(tag.get('href')).scheme \
             and urlparse(tag.get('href')).netloc \
