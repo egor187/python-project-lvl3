@@ -21,8 +21,8 @@ def download(url, download_path):
 
     os.mkdir(path_to_dir)
 
-#    new_src_for_img = img_download(request, path_to_dir)
-#    logger.info('\nimages downloaded')
+    old_src_for_img, new_src_for_img = img_download(request, path_to_dir)
+    logger.info('\nimages downloaded')
 
     new_href_for_link = link_download(request, path_to_dir)
     logger.info('\nlinks downloaded')
@@ -58,17 +58,12 @@ def download(url, download_path):
 
     with open(path_to_file, "w") as r:
         logger.info('Downloading html')
-        img_download(request, download_path, local_source_path)
-
-
-#        logger.info('Downloading html')
-#        for index, tag in enumerate(old_src_for_img):
-#            tag['src'] = os.path.join(
-#                local_source_path,
-#                new_src_for_img[index]
-#            )
-#            logger.debug('substitution source for img to downloaded')
-        logger.debug('substitution source for img to downloaded')
+        for index, tag in enumerate(old_src_for_img):
+            tag['src'] = os.path.join(
+                local_source_path,
+                new_src_for_img[index]
+            )
+            logger.debug('substitution source for img to downloaded')
 
         for index, tag in enumerate(old_href_for_link):
             logger.debug('substitution source for link to downloaded')
