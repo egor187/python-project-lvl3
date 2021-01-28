@@ -10,6 +10,7 @@ from page_loader.logging import logger
 
 def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
+    old_src_to_img_list = []
     new_src_to_img_list = []
     spinner = Spinner('Loading images')
     state = 'go'
@@ -27,6 +28,7 @@ def img_download(request, download_path):
                     request.url,
                     link.get('src')
                 )
+                old_src_to_img_list.append(link)
                 new_src_to_img_list.append(filename_from_img_link)
                 if os.path.isfile(
                     os.path.join(
@@ -52,7 +54,7 @@ def img_download(request, download_path):
                     r.write(response.content)
                     spinner.next()
         state = "FINISHED"
-    return new_src_to_img_list
+    return old_src_to_img_list, new_src_to_img_list
 
 
 def link_download(request, download_path):
