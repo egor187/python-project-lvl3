@@ -25,7 +25,7 @@ def test_correct_link_list():
             'ru-hexlet-io-lessons.rss',
             'ru-hexlet-io-courses.html',
         ]
-        real_href = link_download(requests.get(url), tmpdir)[1]
+        real_href = link_download(requests.get(url), tmpdir)
 
         assert expected_href == real_href
 
