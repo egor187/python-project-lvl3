@@ -45,7 +45,6 @@ def get_filename_from_url(url):
     last_slash_cutted_url = url_without_schema[:-1] \
         if url_without_schema[-1] == "/"\
         else url_without_schema
-    #last_slash_cutted_url = url_without_schema
     file_name_from_url = re.sub(r'[\W+?]', '-', last_slash_cutted_url)
     logger.debug('creating filename for downloaded html')
     return file_name_from_url
@@ -65,14 +64,30 @@ def img_download(request, download_path):
                     request.url, link.get('src')
                         ))
 
-                filename_from_img_link = get_filename_from_tag(request.url, link.get('src'))
+                filename_from_img_link = get_filename_from_tag(
+                    request.url,
+                    link.get('src')
+                )
 
                 new_src_to_img_list.append(filename_from_img_link)
 
-                if os.path.isfile(os.path.join(download_path, filename_from_img_link)):
-                    raise FileExistsError(f'File {filename_from_img_link} already exists')
+                if os.path.isfile(
+                    os.path.join(
+                        download_path,
+                        filename_from_img_link
+                    )
+                ):
+                    raise FileExistsError(
+                        f'File {filename_from_img_link} already exists'
+                    )
 
-                with open(os.path.join(download_path, filename_from_img_link), "wb") as r:
+                with open(
+                    os.path.join(
+                        download_path,
+                        filename_from_img_link
+                    ),
+                    "wb"
+                ) as r:
                     logger.debug(f'downloading image "{link}"')
                     logger.debug(
                         'may occur error if dir for download already exist'
@@ -118,12 +133,11 @@ def link_download(request, download_path):
                     link.get('href')
                 )
 
-            
             if not urlparse(link.get('href')).scheme \
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
                     == urlparse(request.url).netloc:
-                
+
                 new_href_to_link_list.append(file_name)
 
                 if os.path.isfile(os.path.join(download_path, file_name)):
@@ -164,13 +178,21 @@ def script_download(request, download_path):
                     or urlparse(script.get('src')).scheme \
                     and urlparse(script.get('src')).netloc \
                         == urlparse(request.url).netloc:
-                    
+
                     new_src_to_script_list.append(file_name)
 
                     if os.path.isfile(os.path.join(download_path, file_name)):
-                        raise FileExistsError(f'File {filename_form_img_link} already exists')
+                        raise FileExistsError(
+                            f'File {file_name} already exists'
+                        )
 
-                    with open(os.path.join(download_path, file_name), "w") as r:
+                    with open(
+                        os.path.join(
+                            download_path,
+                            file_name
+                        ),
+                        "w"
+                    ) as r:
                         logger.debug(f'downloading script "{script}"')
                         r.write(response.text)
                         spinner.next()
@@ -184,7 +206,9 @@ def download(url, download_path):
     if not os.access(download_path, os.W_OK):
         raise PermissionError(f'Directory {download_path} is unable to write')
     if not os.path.isdir(download_path):
-        raise NotADirectoryError(f'Path to download {download_path} is not a directory')
+        raise NotADirectoryError(
+            f'Path to download {download_path} is not a directory'
+        )
 
     request = requests.get(url)
 
@@ -194,7 +218,6 @@ def download(url, download_path):
             f"from '{request.url}' is '{request.status_code}'"
         )
 
-
     file_name = get_filename_from_url(url)
     path = os.path.join(download_path, file_name)
     path_to_file = path + '.html'
@@ -203,9 +226,9 @@ def download(url, download_path):
 
     if os.path.isdir(path_to_dir):
         raise FileExistsError(f'Directory "{path_to_dir}" is not empty')
-    
+
     os.mkdir(path_to_dir)
-    
+
     new_src_for_img = img_download(request, path_to_dir)
     logger.info('\nimages downloaded')
     new_href_for_link = link_download(request, path_to_dir)
@@ -238,18 +261,26 @@ def download(url, download_path):
     with open(path_to_file, "w") as r:
         logger.info('Downloading html')
         for index, tag in enumerate(old_src_for_img):
-            tag['src'] = os.path.join(local_source_path, new_src_for_img[index])
+            tag['src'] = os.path.join(
+                local_source_path,
+                new_src_for_img[index]
+            )
             logger.debug('substitution source for img to downloaded')
 
         for index, tag in enumerate(old_href_for_link):
             logger.debug('substitution source for link to downloaded')
-            tag['href'] = os.path.join(local_source_path, new_href_for_link[index])
+            tag['href'] = os.path.join(
+                local_source_path,
+                new_href_for_link[index]
+            )
 
         for index, tag in enumerate(old_src_for_script):
             logger.debug('substitution source for script to downloaded')
-            tag['src'] = os.path.join(local_source_path, new_src_for_script[index])
+            tag['src'] = os.path.join(
+                local_source_path,
+                new_src_for_script[index]
+            )
 
         r.write(soup.prettify(formatter="html5"))
-        
 
     return path_to_file
