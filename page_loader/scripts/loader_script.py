@@ -16,7 +16,7 @@ logger.addHandler(handler)
 def main():
     parser = argparse.ArgumentParser(
         description="Download HTML-page into file"
-        )
+    )
     parser.add_argument(
         "web_source",
         type=str, help="destination of resource to download"
