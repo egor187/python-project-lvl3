@@ -50,6 +50,24 @@ def get_filename_from_url(url):
     return file_name_from_url
 
 
+def get_filename_for_link(link, request):
+    if not os.path.splitext(link.get('href'))[1]:
+        logger.debug(
+            'may occur error about ext of file'
+            'in case where "href" attribute is None'
+        )
+        file_name = get_filename_from_tag(
+            request.url,
+            link.get('href')
+        ) + '.html'  # TODO refactor
+    elif os.path.splitext(link.get('href'))[1]:
+        file_name = get_filename_from_tag(
+            request.url,
+            link.get('href')
+        )
+    return file_name
+
+
 def img_download(request, download_path):
     soup = BeautifulSoup(request.text, 'html.parser')
     new_src_to_img_list = []
@@ -109,6 +127,23 @@ def link_download(request, download_path):
     while state != 'FINISHED':
         for link in soup.find_all('link'):
 
+            # if not os.path.splitext(link.get('href'))[1]:
+            #    logger.debug(
+            #        'may occur error about ext of file'
+            #        'in case where "href" attribute is None'
+            #    )
+            #    file_name = get_filename_from_tag(
+            #        request.url,
+            #        link.get('href')
+            #    ) + '.html'  # TODO refactor
+            # elif os.path.splitext(link.get('href'))[1]:
+            #    file_name = get_filename_from_tag(
+            #        request.url,
+            #        link.get('href')
+            #    )
+
+            file_name = get_filename_for_link(link, request)
+
             if not urlparse(link.get('href')).scheme \
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
@@ -121,25 +156,25 @@ def link_download(request, download_path):
                     )
                 )
 
-            if not os.path.splitext(link.get('href'))[1]:
-                logger.debug(
-                    'may occur error about ext of file'
-                    'in case where "href" attribute is None'
-                )
-                file_name = get_filename_from_tag(
-                    request.url,
-                    link.get('href')
-                ) + '.html'  # TODO refactor
-            elif os.path.splitext(link.get('href'))[1]:
-                file_name = get_filename_from_tag(
-                    request.url,
-                    link.get('href')
-                )
+            # if not os.path.splitext(link.get('href'))[1]:
+            #    logger.debug(
+            #        'may occur error about ext of file'
+            #        'in case where "href" attribute is None'
+            #    )
+            #    file_name = get_filename_from_tag(
+            #        request.url,
+            #        link.get('href')
+            #    ) + '.html'  # TODO refactor
+            # elif os.path.splitext(link.get('href'))[1]:
+            #    file_name = get_filename_from_tag(
+            #        request.url,
+            #        link.get('href')
+            #    )
 
-            if not urlparse(link.get('href')).scheme \
-                or urlparse(link.get('href')).scheme \
-                and urlparse(link.get('href')).netloc \
-                    == urlparse(request.url).netloc:
+            # if not urlparse(link.get('href')).scheme \
+            #    or urlparse(link.get('href')).scheme \
+            #    and urlparse(link.get('href')).netloc \
+            #        == urlparse(request.url).netloc:
 
                 new_href_to_link_list.append(file_name)
 
