@@ -110,7 +110,7 @@ def script_download(request, download_path):
                         urljoin(
                             request.url,
                             script.get("src")
-                            )
+                        )
                     )
                     response.raise_for_status()
                     new_src_to_script_list.append(file_name)
