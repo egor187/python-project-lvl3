@@ -58,6 +58,10 @@ def main():
     except FileExistsError as fee:
         print(fee)
         sys.exit(1)
+
+    except Exception as e:
+        print(e)
+        sys.exit(1)
     
     else:
         sys.exit(0)
