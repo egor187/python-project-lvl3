@@ -9,7 +9,8 @@ def get_filename_from_tag(url, source):
     logger.debug('parsing url')
     netloc = re.sub(r'[\W+_?]', '-', url_parsed.netloc)
     tag_without_scheme = urlparse(source).path
-    filename_from_tag = netloc + re.sub(r'[/+?]', '-', tag_without_scheme)
+    # Cutting filename to 60-symbol len
+    filename_from_tag = netloc + re.sub(r'[/+?]', '-', tag_without_scheme)[:60]
     logger.debug('creating filename from <tag> for downloading')
     return filename_from_tag
 
