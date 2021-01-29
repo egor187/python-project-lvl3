@@ -17,7 +17,7 @@ def img_download(request, download_path):
         for link in soup.find_all('img'):
             logger.debug('check for having "src" atribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
-                
+
                 try:
                     response = requests.get(
                         urljoin(
@@ -27,8 +27,10 @@ def img_download(request, download_path):
                     )
                     response.raise_for_status()
                 except requests.HTTPError as r:
-                    print(f' Problem with response recieving from tag: {link.get("src")}. '
-                            f'Error message: {r}')
+                    print(
+                        f' Problem with response recieving from tag: '
+                        f'{link.get("src")}. '
+                        f'Error message: {r}')
 
                 filename_from_img_link = get_filename_from_tag(
                     request.url,
@@ -74,7 +76,7 @@ def link_download(request, download_path):
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
                     == urlparse(request.url).netloc:
-                
+
                 try:
                     response = requests.get(
                         urljoin(
@@ -84,15 +86,19 @@ def link_download(request, download_path):
                     )
                     response.raise_for_status()
                 except requests.HTTPError as r:
-                    print(f' Problem with response recieving from tag: {link.get("href")}. '
-                            f'Error message: {r}')
+                    print(
+                        f' Problem with response recieving from tag: '
+                        f'{link.get("href")}. '
+                        f'Error message: {r}')
 
                 new_href_to_link_list.append(file_name)
                 if os.path.isfile(os.path.join(download_path, file_name)):
                     raise FileExistsError(f'File {file_name} already exists')
 
                 with open(os.path.join(download_path, file_name), "wb") as r:
-                    logger.debug(f'downloading link with href: "{link.get("href")}"')
+                    logger.debug(
+                        f'downloading link with href: "{link.get("href")}"'
+                    )
                     r.write(response.content)
                     spinner.next()
         state = "FINISHED"
@@ -126,8 +132,11 @@ def script_download(request, download_path):
                         )
                         response.raise_for_status()
                     except requests.HTTPError as r:
-                        print(f' Problem with response recieving from tag: {script.get("src")}. '
-                                f'Error message: {r}')
+                        print(
+                            f' Problem with response recieving from tag: '
+                            f'{script.get("src")}. '
+                            f'Error message: {r}'
+                        )
 
                     new_src_to_script_list.append(file_name)
 
