@@ -59,11 +59,6 @@ def main():
         print(fee)
         sys.exit(1)
 
-    except requests.HTTPError:
-        print(
-            'Some connection error is occur while recieve a response from url'
-        )
-
     except Exception as e:
         print(e)
         sys.exit(1)

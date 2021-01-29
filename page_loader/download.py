@@ -17,13 +17,19 @@ def img_download(request, download_path):
         for link in soup.find_all('img'):
             logger.debug('check for having "src" atribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
-                response = requests.get(
-                    urljoin(
-                        request.url,
-                        link.get('src')
+                
+                try:
+                    response = requests.get(
+                        urljoin(
+                            request.url,
+                            link.get("src")
+                        )
                     )
-                )
-                response.raise_for_status()
+                    response.raise_for_status()
+                except requests.HTTPError as r:
+                    print(f' Problem with response recieving from tag: {link.get("src")}. '
+                            f'Error message: {r}')
+
                 filename_from_img_link = get_filename_from_tag(
                     request.url,
                     link.get('src')
@@ -68,20 +74,25 @@ def link_download(request, download_path):
                 or urlparse(link.get('href')).scheme \
                 and urlparse(link.get('href')).netloc \
                     == urlparse(request.url).netloc:
-
-                response = requests.get(
-                    urljoin(
-                        request.url,
-                        link.get("href")
+                
+                try:
+                    response = requests.get(
+                        urljoin(
+                            request.url,
+                            link.get("href")
+                        )
                     )
-                )
-                response.raise_for_status()
+                    response.raise_for_status()
+                except requests.HTTPError as r:
+                    print(f' Problem with response recieving from tag: {link.get("href")}. '
+                            f'Error message: {r}')
+
                 new_href_to_link_list.append(file_name)
                 if os.path.isfile(os.path.join(download_path, file_name)):
                     raise FileExistsError(f'File {file_name} already exists')
 
                 with open(os.path.join(download_path, file_name), "wb") as r:
-                    logger.debug(f'downloading link "{link}"')
+                    logger.debug(f'downloading link with href: "{link.get("href")}"')
                     r.write(response.content)
                     spinner.next()
         state = "FINISHED"
@@ -106,13 +117,18 @@ def script_download(request, download_path):
                     and urlparse(script.get('src')).netloc \
                         == urlparse(request.url).netloc:
 
-                    response = requests.get(
-                        urljoin(
-                            request.url,
-                            script.get("src")
+                    try:
+                        response = requests.get(
+                            urljoin(
+                                request.url,
+                                script.get("src")
+                            )
                         )
-                    )
-                    response.raise_for_status()
+                        response.raise_for_status()
+                    except requests.HTTPError as r:
+                        print(f' Problem with response recieving from tag: {script.get("src")}. '
+                                f'Error message: {r}')
+
                     new_src_to_script_list.append(file_name)
 
                     if os.path.isfile(os.path.join(download_path, file_name)):
