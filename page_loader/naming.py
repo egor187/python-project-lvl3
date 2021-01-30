@@ -30,12 +30,19 @@ def get_filename_for_link(link, request):
     if not os.path.splitext(link.get('href'))[1]:
         logger.debug(
             'may occur error about ext of file'
-            'in case where "href" attribute is None'
+            ' in case where "href" attribute is None'
         )
-        file_name = get_filename_from_tag(
-            request.url,
-            link.get('href')
-        ) + '.html'  # TODO refactor
+        try:
+            file_name = get_filename_from_tag(
+                request.url,
+                link.get('href')
+            ) + '.html'  # TODO refactor
+        except FileExistsError:
+            print('File already exist. Creating new file with [0]')
+            file_name = get_filename_from_tag(
+                request.url,
+                link.get('href')
+            ) + '0' + '.html'
     elif os.path.splitext(link.get('href'))[1]:
         file_name = get_filename_from_tag(
             request.url,

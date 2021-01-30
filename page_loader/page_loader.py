@@ -34,26 +34,32 @@ def download(url, download_path):
 
     old_src_for_img = []
     for tag in soup.find_all("img"):
-        if tag.get("src") and not urlparse(tag.get('src')).scheme:
+        # if tag.get("src") and not urlparse(tag.get('src')).scheme:
+        if tag.get("src"):
             old_src_for_img.append(tag)
 
     old_href_for_link = []
     for tag in soup.find_all('link'):
-        if not urlparse(tag.get('href')).scheme \
-            or urlparse(tag.get('href')).scheme \
-            and urlparse(tag.get('href')).netloc \
-                == urlparse(request.url).netloc:
+        # if not urlparse(tag.get('href')).scheme \
+        #     or urlparse(tag.get('href')).scheme \
+        #     and urlparse(tag.get('href')).netloc \
+        #         == urlparse(request.url).netloc:
+        if tag.get('href'):
             old_href_for_link.append(tag)
 
+    # old_src_for_script = [
+    #     script for script in soup.find_all("script")
+    #     if script.get("src") and urlparse(
+    #         script.get("src")
+    #     ).netloc == urlparse(
+    #         request.url
+    #     ).netloc or script.get("src") and not urlparse(
+    #         script.get("src")
+    #     ).scheme
+    # ]
     old_src_for_script = [
         script for script in soup.find_all("script")
-        if script.get("src") and urlparse(
-            script.get("src")
-        ).netloc == urlparse(
-            request.url
-        ).netloc or script.get("src") and not urlparse(
-            script.get("src")
-        ).scheme
+        if script.get("src")
     ]
 
     with open(path_to_file, "w") as r:
