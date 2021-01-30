@@ -15,7 +15,7 @@ def img_download(request, download_path):
     state = 'go'
     while state != 'FINISHED':
         for link in soup.find_all('img'):
-            logger.debug('check for having "src" atribute in tag <img>')
+            logger.debug('check for having "src" attribute in tag <img>')
             if link.get('src') and not urlparse(link.get('src')).scheme:
 
                 try:
