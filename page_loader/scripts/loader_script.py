@@ -55,9 +55,9 @@ def main():
         print(cae)
         sys.exit(1)
 
-    # except FileExistsError as fee:
-    #     print(fee)
-    #     sys.exit(1)
+    except FileExistsError as fee:
+        print(fee)
+        sys.exit(1)
 
     except Exception as e:
         print(e)

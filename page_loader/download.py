@@ -16,8 +16,7 @@ def img_download(request, download_path):
     while state != 'FINISHED':
         for link in soup.find_all('img'):
             logger.debug('check for having "src" attribute in tag <img>')
-            # if link.get('src') and not urlparse(link.get('src')).scheme:
-            if link.get('src'):
+            if link.get('src') and not urlparse(link.get('src')).scheme:
 
                 try:
                     response = requests.get(
@@ -73,11 +72,11 @@ def link_download(request, download_path):
     while state != 'FINISHED':
         for link in soup.find_all('link'):
             file_name = get_filename_for_link(link, request)
-            # if not urlparse(link.get('href')).scheme \
-            #     or urlparse(link.get('href')).scheme \
-            #     and urlparse(link.get('href')).netloc \
-            #         == urlparse(request.url).netloc:
-            if link.get('href'):
+            if not urlparse(link.get('href')).scheme \
+                or urlparse(link.get('href')).scheme \
+                and urlparse(link.get('href')).netloc \
+                    == urlparse(request.url).netloc:
+
                 try:
                     response = requests.get(
                         urljoin(
@@ -93,8 +92,8 @@ def link_download(request, download_path):
                         f'Error message: {r}')
 
                 new_href_to_link_list.append(file_name)
-                # if os.path.isfile(os.path.join(download_path, file_name)):
-                #     raise FileExistsError(f'File {file_name} already exists')
+                if os.path.isfile(os.path.join(download_path, file_name)):
+                    raise FileExistsError(f'File {file_name} already exists')
 
                 with open(os.path.join(download_path, file_name), "wb") as r:
                     logger.debug(
@@ -119,11 +118,10 @@ def script_download(request, download_path):
                     script.get('src')
                 )
 
-                # if not urlparse(script.get('src')).scheme \
-                #     or urlparse(script.get('src')).scheme \
-                #     and urlparse(script.get('src')).netloc \
-                #         == urlparse(request.url).netloc:
-                if script.get('src'):
+                if not urlparse(script.get('src')).scheme \
+                    or urlparse(script.get('src')).scheme \
+                    and urlparse(script.get('src')).netloc \
+                        == urlparse(request.url).netloc:
 
                     try:
                         response = requests.get(
