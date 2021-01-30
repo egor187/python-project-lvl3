@@ -32,84 +32,51 @@ def download(url, download_path):
 
     soup = BeautifulSoup(request.text, "html.parser")
 
-    # old_src_for_img = []
-    # for tag in soup.find_all("img"):
-    #     if tag.get("src") and not urlparse(tag.get('src')).scheme:
-    #         old_src_for_img.append(tag)
+    old_src_for_img = []
+    for tag in soup.find_all("img"):
+        if tag.get("src") and not urlparse(tag.get('src')).scheme:
+            old_src_for_img.append(tag)
 
-    # old_href_for_link = []
-    # for tag in soup.find_all('link'):
-    #     if not urlparse(tag.get('href')).scheme \
-    #         or urlparse(tag.get('href')).scheme \
-    #         and urlparse(tag.get('href')).netloc \
-    #             == urlparse(request.url).netloc:
-    #         old_href_for_link.append(tag)
+    old_href_for_link = []
+    for tag in soup.find_all('link'):
+        if not urlparse(tag.get('href')).scheme \
+            or urlparse(tag.get('href')).scheme \
+            and urlparse(tag.get('href')).netloc \
+                == urlparse(request.url).netloc:
+            old_href_for_link.append(tag)
 
-    # old_src_for_script = [
-    #     script for script in soup.find_all("script")
-    #     if script.get("src") and urlparse(
-    #         script.get("src")
-    #     ).netloc == urlparse(
-    #         request.url
-    #     ).netloc or script.get("src") and not urlparse(
-    #         script.get("src")
-    #     ).scheme
-    # ]
+    old_src_for_script = [
+        script for script in soup.find_all("script")
+        if script.get("src") and urlparse(
+            script.get("src")
+        ).netloc == urlparse(
+            request.url
+        ).netloc or script.get("src") and not urlparse(
+            script.get("src")
+        ).scheme
+    ]
 
     with open(path_to_file, "w") as r:
         logger.info('Downloading html')
         # By changing mutable obj-list, which is chained with tags of
         # soup-obj, we actually change tags.
-
-        for old_tag_img, new_tag_img in \
-            zip(
-                soup.find_all('img'),
-                new_src_for_img
-            ):
-            old_tag_img['src'] = os.path.join(
+        for index, tag in enumerate(old_src_for_img):
+            tag['src'] = os.path.join(
                 local_source_path,
-                new_tag_img
+                new_src_for_img[index]
             )
-        # for index, tag in enumerate(old_src_for_img):
-        #     tag['src'] = os.path.join(
-        #         local_source_path,
-        #         new_src_for_img[index]
-        #     )
             logger.debug('substitution source for img to downloaded')
-
-        for old_tag_link, new_tag_link in \
-            zip(
-                soup.find_all('link'),
-                new_href_for_link
-            ):
+        for index, tag in enumerate(old_href_for_link):
             logger.debug('substitution source for link to downloaded')
-            old_tag_link['href'] = os.path.join(
+            tag['href'] = os.path.join(
                 local_source_path,
-                new_tag_link
+                new_href_for_link[index]
             )
-        # for index, tag in enumerate(old_href_for_link):
-        #     logger.debug('substitution source for link to downloaded')
-        #     tag['href'] = os.path.join(
-        #         local_source_path,
-        #         new_href_for_link[index]
-        #     )
-
-        for old_tag_script, new_tag_script in \
-            zip(
-                soup.find_all('script'),
-                new_src_for_script
-            ):
+        for index, tag in enumerate(old_src_for_script):
             logger.debug('substitution source for script to downloaded')
-            old_tag_script['src'] = os.path.join(
+            tag['src'] = os.path.join(
                 local_source_path,
-                new_tag_script
+                new_src_for_script[index]
             )
-        # for index, tag in enumerate(old_src_for_script):
-        #     logger.debug('substitution source for script to downloaded')
-        #     tag['src'] = os.path.join(
-        #         local_source_path,
-        #         new_src_for_script[index]
-        #     )
         r.write(soup.prettify(formatter="html5"))
-
     return path_to_file
